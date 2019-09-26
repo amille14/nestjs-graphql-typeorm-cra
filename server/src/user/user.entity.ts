@@ -5,9 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn
 } from 'typeorm'
-import { Field, ID } from 'type-graphql'
+import { Field, ID, ObjectType } from 'type-graphql'
 
-@Entity({ name: 'users' })
+@Entity()
+@ObjectType()
 export class User {
   @Field(type => ID)
   @PrimaryGeneratedColumn()

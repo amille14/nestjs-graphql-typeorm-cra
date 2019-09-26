@@ -5,7 +5,5 @@ import { Repository } from 'typeorm'
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User) private readonly users: Repository<User>
-  ) {}
+  constructor(@InjectRepository(User) public readonly repo: Repository<User>) {}
 }

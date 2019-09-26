@@ -3,7 +3,6 @@ import { Module } from '@nestjs/common'
 import { GraphQLModule } from '@nestjs/graphql'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { UserResolver } from '../user/user.resolver'
 import { UserModule } from './../user/user.module'
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -20,8 +19,9 @@ const ENTITY_MODULES = [UserModule]
       username: 'postgres',
       password: null,
       database: 'development',
-      entities: ['./**/*.entity{.ts,.js}'],
-      synchronize: true
+      entities: ['./src/**/*.entity{.ts,.js}'],
+      synchronize: true,
+      logging: true
     }),
     // Create db entities and graphql schema
     ...ENTITY_MODULES,
