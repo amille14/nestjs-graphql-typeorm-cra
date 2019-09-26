@@ -1,0 +1,26 @@
+{
+  "name": "nestjs-graphql-typeorm-cra",
+  "version": "1.0.0",
+  "description": "Community OS",
+  "repository": "https://github.com/amille14/nestjs-graphql-typeorm-cra.git",
+  "author": "Alex Miller",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "engines": {
+    "node": "12.9.1",
+    "yarn": "1.17.3"
+  },
+  "scripts": {
+    "dev:server": "cd server && yarn start:dev",
+    "dev:client": "cd client && yarn start",
+    "dev": "heroku local -f Procfile.dev -e .env",
+    "build:server": "cd server && yarn build",
+    "build:client": "cd client && yarn build",
+    "build": "yarn build:server && yarn build:client",
+    "start": "cd server && yarn start:prod"
+  }
+}

@@ -1,0 +1,2 @@
+client: yarn dev:client
+server: yarn dev:server
