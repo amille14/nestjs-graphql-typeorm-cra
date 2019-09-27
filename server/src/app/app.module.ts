@@ -30,7 +30,8 @@ const ENTITY_MODULES = [UserModule]
       autoSchemaFile: 'schema.gql',
       debug: isDev,
       playground: isDev,
-      path: process.env.GRAPHQL_ENDPOINT || '/graphql'
+      path: process.env.GRAPHQL_ENDPOINT || '/graphql',
+      context: ({ req, res, connection }) => ({ req, res, connection })
     }),
     // Serve static files
     ServeStaticModule.forRoot({

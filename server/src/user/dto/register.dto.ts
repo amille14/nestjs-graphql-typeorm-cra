@@ -5,6 +5,7 @@ import { IsEmail, MinLength } from 'class-validator'
 export class RegisterArgs {
   @Field()
   @IsEmail(undefined, { message: 'INVALID_EMAIL' })
+  // TODO: Validate email is unique
   email: string
 
   @Field()
