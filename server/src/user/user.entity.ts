@@ -1,11 +1,11 @@
+import { Field, ID, ObjectType } from 'type-graphql'
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
   UpdateDateColumn
-} from 'typeorm'
-import { Field, ID, ObjectType } from 'type-graphql'
+  } from 'typeorm'
 
 @Entity()
 @ObjectType()
@@ -16,19 +16,19 @@ export class User {
 
   @Field(type => Date)
   @CreateDateColumn()
-  createdAt: Date
+  createdAt?: Date
 
   @Field(type => Date)
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt?: Date
 
   @Field()
   @Column('text', { unique: true })
-  email: string
+  email?: string
 
   @Column('text')
-  password: string
+  password?: string
 
   @Column('int', { default: 0 })
-  tokenVersion: number
+  tokenVersion?: number
 }

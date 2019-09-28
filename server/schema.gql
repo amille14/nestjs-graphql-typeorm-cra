@@ -16,10 +16,12 @@ type LoginPayload {
 type Mutation {
   register(email: String!, password: String!): User!
   login(email: String!, password: String!): LoginPayload!
+  logout: Boolean!
+  logoutOtherClients: Boolean!
 }
 
 type Query {
-  me: User
+  me: User!
 }
 
 type User {
