@@ -81,6 +81,8 @@ export class AuthService {
   // REFRESH TOKEN
   // =============
 
+  // TODO: Add refresh token route, scope refresh cookie to route
+
   generateRefreshToken(user: User) {
     const payload = { userId: user.id, tokenVersion: user.tokenVersion }
     return this.jwtService.sign(payload, {

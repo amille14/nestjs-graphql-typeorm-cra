@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common'
+import { UseGuards, UseInterceptors } from '@nestjs/common'
 import { Args, Mutation, Resolver } from '@nestjs/graphql'
 import { Context } from '@nestjs/graphql'
 import { CurrentUser } from '../decorators/currentUser.decorator'
@@ -9,13 +9,12 @@ import { AuthService } from './auth.service'
 import { LoginArgs, LoginPayload } from './dto/login.dto'
 import { RegisterArgs } from './dto/register.dto'
 import { IsAuthenticated } from './isAuthenticated.guard'
+import { SetCurrentUser } from './setCurrentUser.interceptor'
 
-@Resolver(of => User)
+@Resolver()
+@UseInterceptors(SetCurrentUser)
 export class AuthResolver {
-  constructor(
-    private readonly users: UserService,
-    private readonly authService: AuthService
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Mutation(returns => User)
   register(@Args() { email, password }: RegisterArgs): Promise<User> {
@@ -31,7 +30,7 @@ export class AuthResolver {
     const accessToken = this.authService.generateAccessToken(user)
     const refreshToken = this.authService.generateRefreshToken(user)
     this.authService.setRefreshCookie(refreshToken, ctx.res)
-    ctx.user = { id: user.id }
+    ctx.currentUser = { id: user.id }
     return {
       user,
       accessToken
@@ -53,6 +52,7 @@ export class AuthResolver {
   ) {
     // Invalidate all refresh tokens for the current user
     await this.authService.invalidateRefreshTokensForUser(user)
+
     // Create a new valid refresh token for the current client
     const newRefreshToken = this.authService.generateRefreshToken(user)
     this.authService.setRefreshCookie(newRefreshToken, res)
