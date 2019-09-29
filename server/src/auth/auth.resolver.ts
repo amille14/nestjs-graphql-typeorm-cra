@@ -1,18 +1,15 @@
 import { UseGuards, UseInterceptors } from '@nestjs/common'
-import { Args, Mutation, Resolver } from '@nestjs/graphql'
 import { Context } from '@nestjs/graphql'
+import { Args, Mutation, Resolver } from '@nestjs/graphql'
 import { CurrentUser } from '../decorators/currentUser.decorator'
 import { GqlContext } from '../types/gqlContext.type'
 import { User } from '../user/user.entity'
-import { UserService } from '../user/user.service'
 import { AuthService } from './auth.service'
 import { LoginArgs, LoginPayload } from './dto/login.dto'
 import { RegisterArgs } from './dto/register.dto'
 import { IsAuthenticated } from './isAuthenticated.guard'
-import { SetCurrentUser } from './setCurrentUser.interceptor'
 
 @Resolver()
-@UseInterceptors(SetCurrentUser)
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
@@ -24,13 +21,13 @@ export class AuthResolver {
   @Mutation(returns => LoginPayload)
   async login(
     @Args() { email, password }: LoginArgs,
-    @Context() ctx: GqlContext
+    @Context() { res }: GqlContext
   ): Promise<LoginPayload> {
     const user = await this.authService.validateUser(email, password)
     const accessToken = this.authService.generateAccessToken(user)
     const refreshToken = this.authService.generateRefreshToken(user)
-    this.authService.setRefreshCookie(refreshToken, ctx.res)
-    ctx.currentUser = { id: user.id }
+    this.authService.setRefreshCookie(refreshToken, res)
+
     return {
       user,
       accessToken

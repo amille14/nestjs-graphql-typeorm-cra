@@ -14,9 +14,8 @@ export class IsAuthenticated implements CanActivate {
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const ctx = GqlExecutionContext.create(context)
-    const gqlCtx = ctx.getContext()
-    const token = this.authService.getAccessTokenFromContext(gqlCtx)
-    return !!this.authService.validateAccessToken(token)
+    const ctx = GqlExecutionContext.create(context).getContext()
+    const accessToken = this.authService.getAccessTokenFromContext(ctx)
+    return !!this.authService.validateAccessToken(accessToken)
   }
 }
