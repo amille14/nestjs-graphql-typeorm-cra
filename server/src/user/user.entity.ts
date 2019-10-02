@@ -12,7 +12,7 @@ import {
 export class User {
   @Field(type => ID)
   @PrimaryGeneratedColumn()
-  id: number
+  id?: number
 
   @Field(type => Date)
   @CreateDateColumn()

@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
 import { sign, verify } from 'jsonwebtoken'
-import { GqlContext } from '../types/gqlContext.type'
+import { GqlContext } from '../types/gql-context.type'
 import { User } from '../user/user.entity'
 import { UserService } from '../user/user.service'
 
@@ -15,18 +15,17 @@ export class AuthService {
   static REFRESH_COOKIE_NAME = 'rid'
   static REFRESH_COOKIE_PATH = '/refresh_access'
 
-  constructor(private readonly users: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
   // EMAIL + PASSWORD
   // ================
 
   async register(email: string, password: string): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, AuthService.SALT_ROUNDS)
-    const user = this.users.repo.create({
+    return this.userService.create({
       email: email.toLowerCase(),
       password: hashedPassword
     })
-    return this.users.repo.save(user)
   }
 
   async validateUser(email: string, password: string): Promise<User> {
@@ -34,7 +33,7 @@ export class AuthService {
       new UnauthorizedException('INCORRECT_EMAIL_OR_PASSWORD', err)
 
     // Ensure user with email exists
-    const user = await this.users.repo.findOne({ where: { email } })
+    const user = await this.userService.findOne({ email })
     if (!user) throw incorrectEmailOrPassword()
 
     // Ensure passwords match
@@ -92,13 +91,13 @@ export class AuthService {
       : this.getAccessTokenFromRequest(req)
   }
 
-  getUserFromToken(accessToken: string): User | null {
+  getUserFromToken(accessToken: string) {
     try {
       const { userId }: any = verify(
         accessToken,
         process.env.ACCESS_TOKEN_SECRET
       )
-      return this.users.repo.create({ id: userId })
+      return { id: userId }
     } catch (err) {
       return null
     }
@@ -125,7 +124,7 @@ export class AuthService {
 
       // Ensure user exists and token versions match
       const { userId, tokenVersion } = payload
-      const user = await this.users.repo.findOne({ where: { id: userId } })
+      const user = await this.userService.findOne({ where: { id: userId } })
       if (!user || tokenVersion !== user.tokenVersion) {
         throw invalidRefreshToken()
       }
@@ -140,7 +139,7 @@ export class AuthService {
   // acquiring a new access token until they re-authenticate.
   // Note that existing access tokens will continue to work until they expire (at most 15 minutes).
   invalidateRefreshTokensForUser(user: User) {
-    return this.users.repo.increment(user, 'tokenVersion', 1)
+    return this.userService.incrementTokenVersion(user)
   }
 
   getRefreshCookie(req: Request) {

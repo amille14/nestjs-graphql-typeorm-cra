@@ -1,8 +1,8 @@
-import { UseGuards, UseInterceptors } from '@nestjs/common'
+import { UseGuards } from '@nestjs/common'
 import { Context } from '@nestjs/graphql'
 import { Args, Mutation, Resolver } from '@nestjs/graphql'
-import { CurrentUser } from '../decorators/currentUser.decorator'
-import { GqlContext } from '../types/gqlContext.type'
+import { CurrentUser } from '../decorators/current-user.decorator'
+import { GqlContext } from '../types/gql-context.type'
 import { User } from '../user/user.entity'
 import { AuthService } from './auth.service'
 import { LoginArgs, LoginPayload } from './dto/login.dto'
@@ -13,9 +13,20 @@ import { IsAuthenticated } from './isAuthenticated.guard'
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation(returns => User)
-  register(@Args() { email, password }: RegisterArgs): Promise<User> {
-    return this.authService.register(email, password)
+  @Mutation(returns => LoginPayload)
+  async register(
+    @Args() { email, password }: RegisterArgs,
+    @Context() { res }: GqlContext
+  ): Promise<LoginPayload> {
+    const user = await this.authService.register(email, password)
+    const accessToken = this.authService.generateAccessToken(user)
+    const refreshToken = this.authService.generateRefreshToken(user)
+    this.authService.setRefreshCookie(refreshToken, res)
+
+    return {
+      user,
+      accessToken
+    }
   }
 
   @Mutation(returns => LoginPayload)

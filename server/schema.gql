@@ -14,7 +14,9 @@ type LoginPayload {
 }
 
 type Mutation {
-  register(email: String!, password: String!): User!
+  updateUserEmail(email: String!): User!
+  deleteUser: User!
+  register(email: String!, password: String!): LoginPayload!
   login(email: String!, password: String!): LoginPayload!
   logout: Boolean!
   logoutOtherClients: Boolean!
@@ -22,6 +24,12 @@ type Mutation {
 
 type Query {
   me: User!
+}
+
+type Subscription {
+  userCreated: User!
+  userUpdated: User!
+  userDeleted: User!
 }
 
 type User {

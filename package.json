@@ -22,5 +22,9 @@
     "build:client": "cd client && yarn build",
     "build": "yarn build:server && yarn build:client",
     "start": "cd server && yarn start:prod"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "env-cmd": "^10.0.1"
   }
 }

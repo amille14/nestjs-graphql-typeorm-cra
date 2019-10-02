@@ -1,9 +1,22 @@
-import { User } from './user.entity'
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { FindConditions, Repository } from 'typeorm'
+import { PublishableRepository } from '../publishable-repository.service'
+import { RedisPubSubService } from '../redis/redis-pubsub.service'
+import { User } from './user.entity'
 
 @Injectable()
-export class UserService {
-  constructor(@InjectRepository(User) public readonly repo: Repository<User>) {}
+export class UserService extends PublishableRepository {
+  eventPrefix = 'user'
+
+  constructor(
+    @InjectRepository(User) repo: Repository<User>,
+    pubsub: RedisPubSubService
+  ) {
+    super(repo, pubsub)
+  }
+
+  incrementTokenVersion(user: FindConditions<User>) {
+    return this.repo.increment(user, 'tokenVersion', 1)
+  }
 }
