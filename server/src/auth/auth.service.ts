@@ -2,9 +2,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
 import { sign, verify } from 'jsonwebtoken'
-import { GqlContext } from '../types/gql-context.type'
-import { User } from '../user/user.entity'
-import { UserService } from '../user/user.service'
+import { GqlContext } from '../api/types/gql-context.type'
+import { User } from '../entities/user/user.entity'
+import { UserService } from '../entities/user/user.service'
 
 @Injectable()
 export class AuthService {
@@ -97,7 +97,7 @@ export class AuthService {
         accessToken,
         process.env.ACCESS_TOKEN_SECRET
       )
-      return { id: userId }
+      return this.userService.new({ id: userId })
     } catch (err) {
       return null
     }

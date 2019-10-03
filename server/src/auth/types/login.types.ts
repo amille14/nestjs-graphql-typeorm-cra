@@ -1,5 +1,5 @@
 import { ArgsType, Field, ObjectType } from 'type-graphql'
-import { User } from '../../user/user.entity'
+import { User } from '../../entities/user/user.entity'
 
 @ArgsType()
 export class LoginArgs {

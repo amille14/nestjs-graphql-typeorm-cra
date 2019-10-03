@@ -1,11 +1,12 @@
+import { Inject } from '@nestjs/common'
+import { pick } from 'lodash'
 import {
   FindManyOptions,
   FindOneOptions,
   Repository,
   SaveOptions
   } from 'typeorm'
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
-import { RedisPubSubService } from './redis/redis-pubsub.service'
+import { RedisPubSubService } from '../db/redis/redis-pubsub.service'
 
 export enum MutationEventType {
   INSERT = 'created',
@@ -17,17 +18,22 @@ export interface MutationEvent {
   mutation: MutationEventType
   node: any
   updatedFields?: string[]
+  previousValues?: any
 }
 
-export abstract class PublishableRepository {
+// A typeorm repository service that publishes mutation events
+// for use with graphql subscriptions.
+
+export abstract class PublisherRepository {
+  @Inject('RedisPubSubService') protected readonly pubsub: RedisPubSubService
   protected readonly eventPrefix: string
 
-  constructor(
-    protected readonly repo: Repository<any>,
-    protected readonly pubsub: RedisPubSubService
-  ) {}
+  constructor(protected readonly repo: Repository<any>) {
+    const { name } = repo.metadata
+    this.eventPrefix = name
+  }
 
-  // Publish an arbitrary event
+  // Publish an arbitrary event with this repo's event prefix
   publish(eventType: string, data?) {
     return this.pubsub.publish(`${this.eventPrefix}_${eventType}`, data)
   }
@@ -37,8 +43,14 @@ export abstract class PublishableRepository {
     return this.publish(event.mutation, event)
   }
 
+  // Initialize a new entity without saving
+  new(entity: any) {
+    return this.repo.create(entity) as any
+  }
+
+  // Create and save an entity
   async create(entity: any) {
-    const result = await this.repo.save(this.repo.create(entity))
+    const result = await this.repo.save(entity)
     this.publishMutation({
       mutation: MutationEventType.INSERT,
       node: result
@@ -46,38 +58,44 @@ export abstract class PublishableRepository {
     return result as any
   }
 
+  // Update an existing entity
+  // TODO: Can this be done in a single query?
   async update(entity: any, updates: any) {
-    const result = await this.repo.update(entity, updates)
+    const toUpdate = await this.findOne(entity)
+    const result = await this.repo.save({ id: toUpdate.id, ...updates })
+    const updatedFields = Object.keys(updates)
     this.publishMutation({
       mutation: MutationEventType.UPDATE,
       node: result,
-      updatedFields: Object.keys(updates)
+      updatedFields,
+      previousValues: pick(toUpdate, updatedFields)
     })
     return result as any
   }
 
+  // Find and delete an existing entity
+  // TODO: Can this be done in a single query?
   async delete(entity: any) {
-    console.log('ENTITY', entity)
+    const toDelete = await this.findOne(entity)
     const result = await this.repo.remove(entity)
-
-    console.log('DELETED:', result)
-
     this.publishMutation({
       mutation: MutationEventType.DELETE,
-      node: result
+      node: toDelete
     })
-    return result as any
+    return toDelete as any
   }
 
-  // Warning: saving does not publish changes
+  // Save an entity without publishing changes
   async save(entity: any, options?: SaveOptions) {
     return this.repo.save(entity, options) as any
   }
 
+  // Find all matching entities
   async findWhere(where: object, options?: FindManyOptions<any>) {
     return this.repo.find({ where, ...options })
   }
 
+  // Find one matching entity
   async findOne(where: object, options?: FindOneOptions<any>) {
     return this.repo.findOne({ where }, options)
   }
@@ -88,5 +106,13 @@ export abstract class PublishableRepository {
 
   async findByIds(ids: any[], options?: FindManyOptions<any>) {
     return this.repo.findByIds(ids, options)
+  }
+
+  getRepo() {
+    return this.repo
+  }
+
+  buildQuery() {
+    return this.repo.createQueryBuilder()
   }
 }

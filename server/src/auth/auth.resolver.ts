@@ -1,13 +1,13 @@
 import { UseGuards } from '@nestjs/common'
 import { Context } from '@nestjs/graphql'
 import { Args, Mutation, Resolver } from '@nestjs/graphql'
-import { CurrentUser } from '../decorators/current-user.decorator'
-import { GqlContext } from '../types/gql-context.type'
-import { User } from '../user/user.entity'
+import { CurrentUser } from '../api/decorators/current-user.decorator'
+import { GqlContext } from '../api/types/gql-context.type'
+import { User } from '../entities/user/user.entity'
 import { AuthService } from './auth.service'
-import { LoginArgs, LoginPayload } from './dto/login.dto'
-import { RegisterArgs } from './dto/register.dto'
-import { IsAuthenticated } from './isAuthenticated.guard'
+import { IsAuthenticated } from './is-authenticated.guard'
+import { LoginArgs, LoginPayload } from './types/login.types'
+import { RegisterArgs } from './types/register.types'
 
 @Resolver()
 export class AuthResolver {

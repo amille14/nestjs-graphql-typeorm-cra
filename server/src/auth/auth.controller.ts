@@ -2,8 +2,7 @@ import {
   Controller,
   Post,
   Req,
-  Res,
-  UnauthorizedException
+  Res
   } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { AuthService } from './auth.service'

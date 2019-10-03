@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { User } from '../user/user.entity'
+import { User } from '../../entities/user/user.entity'
 
 export class GqlContext {
   req?: Request
