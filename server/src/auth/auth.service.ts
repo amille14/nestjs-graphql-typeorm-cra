@@ -3,28 +3,30 @@ import * as bcrypt from 'bcryptjs'
 import { Request, Response } from 'express'
 import { sign, verify } from 'jsonwebtoken'
 import { GqlContext } from '../api/types/gql-context.type'
+import { ConfigService } from '../config/config.service'
 import { User } from '../entities/user/user.entity'
 import { UserService } from '../entities/user/user.service'
 
 @Injectable()
 export class AuthService {
-  static SALT_ROUNDS = 12
   static ACCESS_TOKEN_EXPIRATION_TIME = '15m' // 15 minutes
   static REFRESH_TOKEN_EXPIRATION_TIME = '14d' // 14 days
   static REFRESH_COOKIE_MAX_AGE = 1000 * 60 * 60 * 24 * 14 // 14 days
   static REFRESH_COOKIE_NAME = 'rid'
   static REFRESH_COOKIE_PATH = '/refresh_access'
 
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly configService: ConfigService
+  ) {}
 
   // EMAIL + PASSWORD
   // ================
 
   async register(email: string, password: string): Promise<User> {
-    // const hashedPassword = await bcrypt.hash(password, AuthService.SALT_ROUNDS)
     return this.userService.createOrUpdate({
       email: email.toLowerCase(),
-      password //: hashedPassword
+      password
     })
   }
 
@@ -48,7 +50,7 @@ export class AuthService {
 
   generateAccessToken(user: User) {
     const payload = { userId: user.id }
-    return sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+    return sign(payload, this.configService.get('ACCESS_TOKEN_SECRET'), {
       expiresIn: AuthService.ACCESS_TOKEN_EXPIRATION_TIME
     })
   }
@@ -59,9 +61,13 @@ export class AuthService {
 
     try {
       // Verify jwt and get payload
-      const payload: any = verify(token, process.env.ACCESS_TOKEN_SECRET, {
-        ignoreExpiration
-      })
+      const payload: any = verify(
+        token,
+        this.configService.get('ACCESS_TOKEN_SECRET'),
+        {
+          ignoreExpiration
+        }
+      )
 
       // Ensure payload contains a userId
       if (!payload.userId) throw invalidAccessToken()
@@ -95,7 +101,7 @@ export class AuthService {
     try {
       const { userId }: any = verify(
         accessToken,
-        process.env.ACCESS_TOKEN_SECRET
+        this.configService.get('ACCESS_TOKEN_SECRET')
       )
       return this.userService.build({ id: userId })
     } catch (err) {
@@ -108,7 +114,7 @@ export class AuthService {
 
   generateRefreshToken(user: User) {
     const payload = { userId: user.id, tokenVersion: user.tokenVersion }
-    return sign(payload, process.env.REFRESH_TOKEN_SECRET, {
+    return sign(payload, this.configService.get('REFRESH_TOKEN_SECRET'), {
       expiresIn: AuthService.REFRESH_TOKEN_EXPIRATION_TIME
     })
   }
@@ -119,7 +125,10 @@ export class AuthService {
 
     try {
       // Verify jwt
-      const payload: any = verify(token, process.env.REFRESH_TOKEN_SECRET)
+      const payload: any = verify(
+        token,
+        this.configService.get('REFRESH_TOKEN_SECRET')
+      )
       if (!payload) throw invalidRefreshToken()
 
       // Ensure user exists and token versions match
@@ -152,7 +161,7 @@ export class AuthService {
       path: `/auth${AuthService.REFRESH_COOKIE_PATH}`,
       httpOnly: true,
       sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production' // Require HTTPS only in production
+      secure: this.configService.isProduction() // Require HTTPS only in production
     })
   }
 

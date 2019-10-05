@@ -2,23 +2,23 @@ import { Module } from '@nestjs/common'
 import { GraphQLModule } from '@nestjs/graphql'
 import { AuthModule } from '../auth/auth.module'
 import { AuthService } from '../auth/auth.service'
+import { ConfigModule } from '../config/config.module'
+import { ConfigService } from '../config/config.service'
 import { DefaultResolver } from './default.resolver'
 import { GqlContext } from './types/gql-context.type'
-
-const isDev = process.env.NODE_ENV === 'development'
 
 // Our apollo graphql api
 
 @Module({
   imports: [
     GraphQLModule.forRootAsync({
-      imports: [AuthModule],
-      inject: [AuthService],
-      useFactory: async ([authService]: AuthService[]) => ({
+      imports: [AuthModule, ConfigModule],
+      inject: [AuthService, ConfigService],
+      useFactory: async ([authService, configService]) => ({
         autoSchemaFile: 'schema.gql',
         path: '/api',
-        debug: isDev,
-        playground: isDev,
+        debug: configService.isDev(),
+        playground: configService.isDev(),
         installSubscriptionHandlers: true,
         subscriptions: {
           path: '/api/ws',

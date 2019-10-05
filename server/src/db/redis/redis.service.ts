@@ -1,8 +1,10 @@
+import { Injectable } from '@nestjs/common'
 import * as Redis from 'ioredis'
-import { redisConfig } from './redis.config'
+import { ConfigService } from './../../config/config.service'
 
+@Injectable()
 export class RedisService extends Redis {
-  constructor() {
-    super(redisConfig)
+  constructor(private readonly configService: ConfigService) {
+    super(configService.getRedisConfig())
   }
 }

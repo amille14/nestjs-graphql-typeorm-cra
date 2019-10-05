@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import * as Redis from 'ioredis'
-import { redisConfig } from './redis.config'
+import { ConfigService } from './../../config/config.service'
 
 @Injectable()
 export class RedisPubSubService extends RedisPubSub {
-  constructor() {
+  constructor(private readonly configService: ConfigService) {
     super({
-      publisher: new Redis(redisConfig),
-      subscriber: new Redis(redisConfig)
+      publisher: new Redis(configService.getRedisConfig()),
+      subscriber: new Redis(configService.getRedisConfig())
     })
   }
 }

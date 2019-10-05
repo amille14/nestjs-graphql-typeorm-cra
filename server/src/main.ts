@@ -1,8 +1,10 @@
 import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import * as cookieParser from 'cookie-parser'
+import debug from 'debug'
 import * as helmet from 'helmet'
 import { AppModule } from './app.module'
+debug('server')
 
 const PORT = parseInt(process.env.PORT, 10) || 5000
 const HOST = process.env.HOST || 'localhost'

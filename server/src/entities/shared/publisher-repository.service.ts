@@ -27,7 +27,7 @@ export abstract class PublisherRepository<Entity extends IdEntity> {
     return this.repo.create(entity)
   }
 
-  // Create and save an entity, updating it if it already exists
+  // Create and save an entity, updating if it already exists
   async createOrUpdate(entity: DeepPartial<Entity>) {
     return await this.repo.save(this.build(entity) as any)
   }
@@ -38,8 +38,9 @@ export abstract class PublisherRepository<Entity extends IdEntity> {
     const current = await this.repo.findOneOrFail({ where: entity })
     // Build a new entity with only the id and updated fields.
     // This allows us to publish only the fields that changed in the MutationPublisherSubscriber.
-    const toUpdate: any = this.build({ id: current.id, ...updates } as any)
-    return await this.repo.save(toUpdate)
+    // const toUpdate: any = this.build({ id: current.id, ...updates } as any)
+    const toUpdate = Object.assign(current, updates, { changes: updates })
+    return await this.repo.save(toUpdate as any)
   }
 
   // Find and delete an existing entity

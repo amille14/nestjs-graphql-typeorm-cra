@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { InjectConnection } from '@nestjs/typeorm'
-import { pick } from 'lodash'
 import {
   Connection,
   EntitySubscriberInterface,
@@ -59,9 +58,10 @@ export class MutationPublisherSubscriber
     this.pubsub.publish(`${targetName}_${mutationType}`, mutation)
   }
 
+  // Store entity changes before updating
   async beforeUpdate(event: UpdateEvent<IdEntity>) {
     const { entity, databaseEntity } = event
-    event.entity.changes = { ...entity }
+    if (!entity.changes) event.entity.changes = { ...entity }
     delete event.entity.changes.id
   }
 
