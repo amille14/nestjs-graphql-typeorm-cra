@@ -9,8 +9,9 @@ import {
 import { CurrentUser } from '../../api/decorators/current-user.decorator'
 import { IsAuthenticated } from '../../auth/is-authenticated.guard'
 import { RedisPubSubService } from '../../db/redis/redis-pubsub.service'
-import { User, UserMutationPayload } from './user.entity'
+import { User } from './user.entity'
 import { UserService } from './user.service'
+import { UserMutationPayload } from './user.types'
 
 @Resolver()
 export class UserResolver {

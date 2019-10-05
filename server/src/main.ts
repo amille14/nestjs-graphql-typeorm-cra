@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
+import { useContainer } from 'class-validator'
 import * as cookieParser from 'cookie-parser'
 import debug from 'debug'
 import * as helmet from 'helmet'
@@ -19,7 +20,8 @@ async function bootstrap() {
   app.use(helmet())
   app.use(cookieParser())
 
-  // Global pipes
+  // Setup validation
+  useContainer(app.select(AppModule), { fallbackOnErrors: true })
   app.useGlobalPipes(new ValidationPipe())
 
   // Start server

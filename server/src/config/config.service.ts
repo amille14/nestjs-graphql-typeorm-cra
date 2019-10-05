@@ -1,5 +1,6 @@
 import * as Joi from '@hapi/joi'
 import { Injectable } from '@nestjs/common'
+import { TypeOrmModuleOptions } from '@nestjs/typeorm'
 import * as dotenv from 'dotenv'
 import * as fs from 'fs'
 import { RedisOptions } from 'ioredis'
@@ -74,6 +75,21 @@ export class ConfigService {
       showFriendlyErrorStack: this.isDev(),
       retryStrategy: (attempt: number) => Math.max(attempt * 100, 3000)
     }
+  }
+
+  getTypeOrmConfig(): TypeOrmModuleOptions {
+    const config = this.getSchemaConfig('typeOrm')
+    return {
+      type: config.DATABASE_TYPE,
+      host: config.DATABASE_HOST,
+      port: config.DATABASE_PORT,
+      database: config.DATABASE_NAME,
+      username: config.DATABASE_USERNAME,
+      password: config.DATABASE_PASSWORD,
+      entities: ['./src/**/*.entity{.ts,.js}'],
+      logging: true,
+      synchronize: this.isDev()
+    } as any
   }
 
   isDev() {

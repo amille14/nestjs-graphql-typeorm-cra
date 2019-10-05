@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { FindConditions, Repository } from 'typeorm'
-import { PublisherRepository } from '../shared/publisher-repository.service'
+import { PublisherRepository } from '../shared/services/publisher-repository.service'
 import { User } from './user.entity'
 
 @Injectable()

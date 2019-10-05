@@ -1,5 +1,6 @@
 import { Field, ID, ObjectType } from 'type-graphql'
 import {
+  BaseEntity,
   BeforeInsert,
   CreateDateColumn,
   PrimaryColumn,

@@ -14,7 +14,10 @@ import { GqlContext } from './types/gql-context.type'
     GraphQLModule.forRootAsync({
       imports: [AuthModule, ConfigModule],
       inject: [AuthService, ConfigService],
-      useFactory: async ([authService, configService]) => ({
+      useFactory: async (
+        authService: AuthService,
+        configService: ConfigService
+      ) => ({
         autoSchemaFile: 'schema.gql',
         path: '/api',
         debug: configService.isDev(),

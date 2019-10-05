@@ -53,8 +53,6 @@ export class MutationPublisherSubscriber
       delete mutation.entity.changes
     }
 
-    console.log(mutation)
-
     this.pubsub.publish(`${targetName}_${mutationType}`, mutation)
   }
 

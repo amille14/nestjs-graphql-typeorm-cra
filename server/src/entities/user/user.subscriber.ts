@@ -5,8 +5,7 @@ import {
   Connection,
   EntitySubscriberInterface,
   EventSubscriber,
-  InsertEvent,
-  UpdateEvent
+  InsertEvent
   } from 'typeorm'
 import { User } from './user.entity'
 
@@ -29,6 +28,7 @@ export class UserSubscriber implements EntitySubscriberInterface<User> {
     return await bcrypt.hash(password, SALT_ROUNDS)
   }
 
+  // Always store hashed passwords when registering a new user
   async beforeInsert(event: InsertEvent<User>) {
     const { password } = event.entity
     if (password) {

@@ -4,6 +4,7 @@ import { join } from 'path'
 import { ApiModule } from './api/api.module'
 import { AuthModule } from './auth/auth.module'
 import { DbModule } from './db/db.module'
+import { IsUnique } from './entities/shared/validators/is-unique.validator'
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { DbModule } from './db/db.module'
       rootPath: join(__dirname, '../../client/build'),
       renderPath: '/static'
     })
-  ]
+  ],
+  providers: [IsUnique]
 })
 export class AppModule {}

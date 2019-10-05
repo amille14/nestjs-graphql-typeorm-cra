@@ -1,11 +1,9 @@
 import { Inject } from '@nestjs/common'
-import { pick } from 'lodash'
 import { DeepPartial, FindManyOptions, Repository } from 'typeorm'
-import { RedisPubSubService } from '../../db/redis/redis-pubsub.service'
-import { IdEntity } from './types/id-entity.types'
-import { MutationPayload, MutationType } from './types/mutation-payload.types'
+import { RedisPubSubService } from '../../../db/redis/redis-pubsub.service'
+import { IdEntity } from '../types/id-entity.types'
 
-// A typeorm repository service that publishes mutation events
+// A typeorm repository service capable of publishing events
 // for use with graphql subscriptions.
 
 export abstract class PublisherRepository<Entity extends IdEntity> {
@@ -36,9 +34,7 @@ export abstract class PublisherRepository<Entity extends IdEntity> {
   // TODO: Can this be done in a single query?
   async update(entity: Entity, updates: Partial<Entity>) {
     const current = await this.repo.findOneOrFail({ where: entity })
-    // Build a new entity with only the id and updated fields.
-    // This allows us to publish only the fields that changed in the MutationPublisherSubscriber.
-    // const toUpdate: any = this.build({ id: current.id, ...updates } as any)
+    // Assign updates and set changes field so we can access changed fields later
     const toUpdate = Object.assign(current, updates, { changes: updates })
     return await this.repo.save(toUpdate as any)
   }
