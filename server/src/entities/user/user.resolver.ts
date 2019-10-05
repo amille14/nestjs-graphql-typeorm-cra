@@ -6,12 +6,10 @@ import {
   Resolver,
   Subscription
   } from '@nestjs/graphql'
-import { string } from 'prop-types'
-import { Arg } from 'type-graphql'
 import { CurrentUser } from '../../api/decorators/current-user.decorator'
 import { IsAuthenticated } from '../../auth/is-authenticated.guard'
 import { RedisPubSubService } from '../../db/redis/redis-pubsub.service'
-import { User } from './user.entity'
+import { User, UserMutationPayload } from './user.entity'
 import { UserService } from './user.service'
 
 @Resolver()
@@ -42,24 +40,14 @@ export class UserResolver {
     return await this.userService.update(user, { email })
   }
 
-  @Subscription(returns => User, {
-    resolve: payload => payload.node
+  @Subscription(returns => UserMutationPayload, {
+    resolve: payload => payload
   })
-  userCreated() {
-    return this.pubsub.asyncIterator('User_created')
-  }
-
-  @Subscription(returns => User, {
-    resolve: payload => payload.node
-  })
-  userUpdated() {
-    return this.pubsub.asyncIterator('User_updated')
-  }
-
-  @Subscription(returns => User, {
-    resolve: payload => payload.node
-  })
-  userDeleted() {
-    return this.pubsub.asyncIterator('User_deleted')
+  users() {
+    return this.pubsub.asyncIterator([
+      'User_created',
+      'User_updated',
+      'User_deleted'
+    ])
   }
 }

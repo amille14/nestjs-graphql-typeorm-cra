@@ -5,5 +5,5 @@ export class GqlContext {
   req?: Request
   res?: Response
   conn?: any
-  currentUser?: User
+  currentUser?: Pick<User, 'id'>
 }

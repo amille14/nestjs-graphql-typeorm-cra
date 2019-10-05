@@ -23,15 +23,19 @@ type Mutation {
   default: String!
 }
 
+enum MutationEventType {
+  INSERT
+  UPDATE
+  DELETE
+}
+
 type Query {
   me: User!
   default: String!
 }
 
 type Subscription {
-  userCreated: User!
-  userUpdated: User!
-  userDeleted: User!
+  users: UserMutationPayload!
   default: String!
 }
 
@@ -40,4 +44,18 @@ type User {
   createdAt: DateTime!
   updatedAt: DateTime!
   email: String!
+}
+
+type UserMutationPayload {
+  mutation: MutationEventType!
+  entity: User!
+  updatedFields: [String!]
+  previousValues: UserPartial
+}
+
+type UserPartial {
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  email: String
 }

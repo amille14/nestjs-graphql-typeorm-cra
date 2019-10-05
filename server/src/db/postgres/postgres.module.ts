@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { EntityValidatorSubscriber } from '../../entities/shared/subscribers/entity-validator.subscriber'
+import { MutationPublisherSubscriber } from '../../entities/shared/subscribers/mutation-publisher.subscriber'
+import { RedisModule } from './../redis/redis.module'
 
 @Module({
   imports: [
@@ -14,7 +17,9 @@ import { TypeOrmModule } from '@nestjs/typeorm'
       entities: ['./src/**/*.entity{.ts,.js}'],
       synchronize: true,
       logging: true
-    })
-  ]
+    }),
+    RedisModule
+  ],
+  providers: [EntityValidatorSubscriber, MutationPublisherSubscriber]
 })
 export class PostgresModule {}

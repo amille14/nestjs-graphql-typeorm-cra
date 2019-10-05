@@ -6,6 +6,7 @@ import { RedisModule } from '../../db/redis/redis.module'
 import { User } from './user.entity'
 import { UserResolver } from './user.resolver'
 import { UserService } from './user.service'
+import { UserSubscriber } from './user.subscriber'
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { UserService } from './user.service'
     forwardRef(() => AuthModule),
     RedisModule
   ],
-  providers: [UserService, UserResolver],
+  providers: [UserService, UserResolver, UserSubscriber],
   exports: [UserService, UserResolver]
 })
 export class UserModule {}

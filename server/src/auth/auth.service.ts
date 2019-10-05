@@ -21,10 +21,10 @@ export class AuthService {
   // ================
 
   async register(email: string, password: string): Promise<User> {
-    const hashedPassword = await bcrypt.hash(password, AuthService.SALT_ROUNDS)
-    return this.userService.create({
+    // const hashedPassword = await bcrypt.hash(password, AuthService.SALT_ROUNDS)
+    return this.userService.createOrUpdate({
       email: email.toLowerCase(),
-      password: hashedPassword
+      password //: hashedPassword
     })
   }
 
@@ -97,7 +97,7 @@ export class AuthService {
         accessToken,
         process.env.ACCESS_TOKEN_SECRET
       )
-      return this.userService.new({ id: userId })
+      return this.userService.build({ id: userId })
     } catch (err) {
       return null
     }

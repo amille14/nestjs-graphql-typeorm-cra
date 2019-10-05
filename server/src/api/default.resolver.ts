@@ -7,7 +7,7 @@ import {
 import {} from 'type-graphql'
 
 // Graphql cannot have empty Query, Mutation, and Subscription types
-// so we need to create defaults.
+// so we need to create defaults for each.
 
 @Resolver()
 export class DefaultResolver {
@@ -21,8 +21,8 @@ export class DefaultResolver {
     return ''
   }
 
-  @Subscription(returns => String, { resolve: payload => '' })
-  default() {
+  @Subscription(returns => String, { name: 'default', resolve: payload => '' })
+  defaultSubscription() {
     return ''
   }
 }

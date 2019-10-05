@@ -1,12 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { FindConditions, Repository } from 'typeorm'
-import { RedisPubSubService } from '../../db/redis/redis-pubsub.service'
-import { PublisherRepository } from '../publisher-repository.service'
+import { PublisherRepository } from '../shared/publisher-repository.service'
 import { User } from './user.entity'
 
 @Injectable()
-export class UserService extends PublisherRepository {
+export class UserService extends PublisherRepository<User> {
   constructor(@InjectRepository(User) repo: Repository<User>) {
     super(repo)
   }
