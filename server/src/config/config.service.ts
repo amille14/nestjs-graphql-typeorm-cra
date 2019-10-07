@@ -51,7 +51,7 @@ export class ConfigService {
   private validateConfig(config: EnvConfig): EnvConfig {
     const configSchema: Joi.ObjectSchema = Joi.object(
       Object.assign({}, ...Object.values(ConfigService.schemas))
-    )
+    ).unknown(true)
 
     const { error, value: validConfig } = configSchema.validate(config)
     if (error) throw new Error(`Invalid config: ${error.message}`)

@@ -11,8 +11,8 @@
     "client"
   ],
   "engines": {
-    "node": "12.9.1",
-    "yarn": "1.17.3"
+    "node": "12.11.1",
+    "yarn": "1.19.0"
   },
   "scripts": {
     "dev:server": "cd server && yarn start:dev",
