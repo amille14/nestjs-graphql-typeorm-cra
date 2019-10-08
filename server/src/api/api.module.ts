@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common'
 import { GraphQLModule } from '@nestjs/graphql'
+import chalk from 'chalk'
+import { inspect } from 'util'
 import { AuthModule } from '../auth/auth.module'
 import { AuthService } from '../auth/auth.service'
 import { ConfigModule } from '../config/config.module'
 import { ConfigService } from '../config/config.service'
+import { CORS_OPTIONS } from './../main'
 import { DefaultResolver } from './default.resolver'
 import { GqlContext } from './types/gql-context.type'
 
@@ -20,11 +23,12 @@ import { GqlContext } from './types/gql-context.type'
       ) => ({
         autoSchemaFile: 'schema.gql',
         path: '/api',
+        cors: CORS_OPTIONS,
         debug: configService.isDev(),
         playground: configService.isDev(),
         installSubscriptionHandlers: true,
         subscriptions: {
-          path: '/api/ws',
+          path: '/api',
           onConnect: async (params, socket, context) => {
             const { accessToken } = params
 
@@ -59,6 +63,18 @@ import { GqlContext } from './types/gql-context.type'
             conn,
             currentUser
           }
+        },
+        formatError: error => {
+          // logFormatter('ERR', error, 'red')
+          const { stacktrace } = error.extensions.exception
+          console.error(
+            chalk.red(inspect(stacktrace, { depth: null, showHidden: true }))
+          )
+          return error
+        },
+        formatResponse: res => {
+          // if (res.data) logFormatter('RES', res.data, 'green')
+          return res
         }
       })
     })

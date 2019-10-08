@@ -13,22 +13,16 @@ export class AuthController {
 
   @Post(AuthService.REFRESH_COOKIE_PATH)
   async refreshAccess(@Req() req: Request, @Res() res: Response) {
+    // Validate refresh token
     const refreshToken = this.authService.getRefreshCookie(req)
+    const user = await this.authService.validateRefreshToken(refreshToken)
 
-    try {
-      // Validate refresh token
-      const user = await this.authService.validateRefreshToken(refreshToken)
+    // Create new access token
+    const accessToken = this.authService.generateAccessToken(user)
 
-      // Create new access token
-      const accessToken = this.authService.generateAccessToken(user)
-
-      // Create new refresh token and set cookie
-      const newRefreshToken = this.authService.generateRefreshToken(user)
-      this.authService.setRefreshCookie(newRefreshToken, res)
-
-      return res.send({ ok: true, accessToken })
-    } catch (err) {
-      return res.send({ ok: false, accessToken: '' })
-    }
+    // Create new refresh token and set cookie
+    const newRefreshToken = this.authService.generateRefreshToken(user)
+    this.authService.setRefreshCookie(newRefreshToken, res)
+    return res.send({ ok: true, accessToken })
   }
 }

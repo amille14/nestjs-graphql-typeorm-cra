@@ -1,2 +1,2 @@
-client: yarn dev:client
 server: yarn dev:server
+client: yarn dev:client

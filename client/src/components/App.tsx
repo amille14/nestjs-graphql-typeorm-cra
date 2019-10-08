@@ -1,23 +1,31 @@
-import { useQuery } from '@apollo/react-hooks'
-import gql from 'graphql-tag'
-import React, { Suspense } from 'react'
+import { useApolloClient } from '@apollo/react-hooks'
+import React, { useEffect, useState } from 'react'
+import { useGetAccessTokenQuery, useSetAccessTokenMutation } from '../graphql/generated'
 import '../styles/app.scss'
-
-const ME_QUERY = gql`
-  {
-    me {
-      id
-      email
-    }
-  }
-`
+import { refreshAccessToken } from '../utils/auth'
+import Me from './Me'
 
 const App: React.FC = () => {
-  const { data } = useQuery(ME_QUERY)
+  const { cache } = useApolloClient()
+  const [loading, setLoading] = useState(true)
+  const [setAccessToken] = useSetAccessTokenMutation()
+  const {
+    data: { accessToken }
+  } = useGetAccessTokenQuery() as any
 
+  useEffect(() => {
+    refreshAccessToken(cache).then(async res => {
+      const { accessToken: newToken } = await res.json()
+      await setAccessToken({ variables: { token: newToken } })
+      setLoading(false)
+    })
+  }, [cache])
+
+  if (loading) return <div>Loading...</div>
   return (
     <div className="App">
-      <Suspense fallback="Loading...">ME: {data && data.me ? data.me.email : 'who dis'}</Suspense>
+      Access Token: {accessToken}
+      <Me />
     </div>
   )
 }

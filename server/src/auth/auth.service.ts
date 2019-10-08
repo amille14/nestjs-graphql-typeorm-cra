@@ -123,25 +123,23 @@ export class AuthService {
     const invalidRefreshToken = (err?) =>
       new UnauthorizedException('INVALID_REFRESH_TOKEN', err)
 
+    // Verify jwt
+    let payload: any
     try {
-      // Verify jwt
-      const payload: any = verify(
-        token,
-        this.configService.get('REFRESH_TOKEN_SECRET')
-      )
-      if (!payload) throw invalidRefreshToken()
-
-      // Ensure user exists and token versions match
-      const { userId, tokenVersion } = payload
-      const user = await this.userService.findOne({ where: { id: userId } })
-      if (!user || tokenVersion !== user.tokenVersion) {
-        throw invalidRefreshToken()
-      }
-
-      return user
+      payload = verify(token, this.configService.get('REFRESH_TOKEN_SECRET'))
     } catch (err) {
       throw invalidRefreshToken(err)
     }
+
+    // Ensure user exists and token versions match
+    if (!payload) throw invalidRefreshToken()
+    const { userId, tokenVersion } = payload
+    const user = await this.userService.findOne({ where: { id: userId } })
+    if (!user || tokenVersion !== user.tokenVersion) {
+      throw invalidRefreshToken()
+    }
+
+    return user
   }
 
   // Invalidates all refresh tokens for the user, preventing all clients associated with that user from

@@ -1,0 +1,15 @@
+type Query {
+  accessToken: String
+}
+
+type Mutation {
+  setAccessToken(token: String!): String!
+}
+
+query getAccessToken {
+  accessToken @client
+}
+
+mutation setAccessToken($token: String!) {
+  setAccessToken(token: $token) @client
+}

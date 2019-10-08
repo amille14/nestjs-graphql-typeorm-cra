@@ -2,6 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:4000/",
   "dependencies": {
     "@apollo/react-hooks": "^3.1.2",
     "@types/jest": "24.0.18",
@@ -13,21 +14,25 @@
     "apollo-link": "^1.2.13",
     "apollo-link-error": "^1.1.12",
     "apollo-link-http": "^1.5.16",
+    "apollo-link-token-refresh": "^0.2.6",
     "apollo-link-ws": "^1.0.19",
     "apollo-utilities": "^1.3.2",
     "graphql": "^14.5.8",
     "graphql-tag": "^2.10.1",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
+    "react-router-dom": "^5.1.2",
     "react-scripts": "3.2.0",
     "subscriptions-transport-ws": "^0.9.16",
     "typescript": "3.6.3"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=3000 react-scripts start && yarn gen:watch",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "gen": "graphql-codegen --config codegen.yml",
+    "gen:watch": "graphql-codegen --config codegen.yml --watch"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -44,9 +49,13 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5100",
   "devDependencies": {
+    "@graphql-codegen/cli": "^1.8.1",
+    "@graphql-codegen/typescript": "1.8.1",
+    "@graphql-codegen/typescript-operations": "1.8.1",
+    "@graphql-codegen/typescript-react-apollo": "1.8.1",
     "@types/graphql": "^14.5.0",
+    "@types/react-router-dom": "^5.1.0",
     "node-sass": "^4.12.0"
   }
 }

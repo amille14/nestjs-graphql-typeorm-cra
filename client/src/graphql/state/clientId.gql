@@ -1,0 +1,15 @@
+type Query {
+  clientId: String!
+}
+
+type Mutation {
+  generateClientId: String!
+}
+
+query getClientId {
+  clientId @client
+}
+
+mutation generateClientId {
+  generateClientId @client
+}
