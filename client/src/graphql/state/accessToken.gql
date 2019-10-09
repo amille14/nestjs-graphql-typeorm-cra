@@ -1,5 +1,5 @@
 type Query {
-  accessToken: String
+  accessToken: String!
 }
 
 type Mutation {

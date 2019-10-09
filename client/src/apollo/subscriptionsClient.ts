@@ -7,7 +7,7 @@ const SERVER_PORT = process.env.REACT_APP_SERVER_PORT
 const API_SUBSCRIPTIONS_ENDPOINT = `ws://${SERVER_HOST}:${SERVER_PORT}/api`
 
 export const createSubscriptionsClient = (cache: ApolloCache<any>): SubscriptionClient => {
-  const client: any = new SubscriptionClient(API_SUBSCRIPTIONS_ENDPOINT, {
+  const subscriptionsClient: any = new SubscriptionClient(API_SUBSCRIPTIONS_ENDPOINT, {
     reconnect: true,
     // lazy: true,
     connectionParams: () => ({
@@ -22,12 +22,12 @@ export const createSubscriptionsClient = (cache: ApolloCache<any>): Subscription
       }
     }
   })
-  client.onDisconnected(() => console.info('%c[Websocket disconnected! Retrying...]', 'color: indianRed;'))
-  client.onConnecting(() => console.info('%c[Websocket connecting...]', 'color: lightskyblue;'))
-  client.onReconnecting(() => console.info('%c[Websocket reconnecting...]', 'color: lightskyblue;'))
+  subscriptionsClient.onDisconnected(() => console.info('%c[Websocket disconnected! Retrying...]', 'color: indianRed;'))
+  subscriptionsClient.onConnecting(() => console.info('%c[Websocket connecting...]', 'color: lightskyblue;'))
+  subscriptionsClient.onReconnecting(() => console.info('%c[Websocket reconnecting...]', 'color: lightskyblue;'))
 
   // Fix for https://github.com/apollographql/subscriptions-transport-ws/issues/377
-  client.maxConnectTimeGenerator.duration = () => client.maxConnectTimeGenerator.max
+  subscriptionsClient.maxConnectTimeGenerator.duration = () => subscriptionsClient.maxConnectTimeGenerator.max
 
-  return client
+  return subscriptionsClient
 }

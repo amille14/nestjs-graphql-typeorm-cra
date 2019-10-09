@@ -17,16 +17,19 @@ export const createApolloClient = () => {
   const cache = new InMemoryCache()
 
   // Setup Apollo client
-  const client = new ApolloClient({
+  let client
+  const links = [
+    createLoggerLink(),
+    createAuthLink(),
+    createRefreshLink(client),
+    createErrorLink(client),
+    createHybridLink(client)
+  ]
+  client = new ApolloClient({
     cache,
     resolvers,
-    link: ApolloLink.from([
-      createLoggerLink(),
-      // createErrorLink(cache),
-      // createRefreshLink(cache),
-      createAuthLink(cache),
-      createHybridLink(cache)
-    ])
+    link: ApolloLink.from(links),
+    connectToDevTools: true
   })
 
   // Setup local state

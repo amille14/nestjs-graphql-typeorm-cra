@@ -1,7 +1,7 @@
 import cuid from 'cuid'
 
 export const defaults = {
-  accessToken: null,
+  accessToken: '',
   clientId: cuid()
 }
 

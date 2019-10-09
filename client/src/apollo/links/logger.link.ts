@@ -21,12 +21,21 @@ export const createLoggerLink = () => {
 
     // Log responses
     return forward(operation).map(result => {
-      console.log(
-        `%c[RES] %c${opType.toUpperCase()} ${operationName}`,
-        'color: lightgreen;',
-        `color: ${OPERATION_COLORS[opType]}`,
-        result.data
-      )
+      if (result.errors) {
+        console.error(
+          `%c[RES] %c${opType.toUpperCase()} ${operationName}`,
+          'color: indianred;',
+          `color: ${OPERATION_COLORS[opType]}`,
+          result.errors[0].message
+        )
+      } else {
+        console.log(
+          `%c[RES] %c${opType.toUpperCase()} ${operationName}`,
+          'color: lightgreen;',
+          `color: ${OPERATION_COLORS[opType]}`,
+          result.data
+        )
+      }
       return result
     })
   })

@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common'
 import { GraphQLModule } from '@nestjs/graphql'
-import chalk from 'chalk'
-import { inspect } from 'util'
 import { AuthModule } from '../auth/auth.module'
 import { AuthService } from '../auth/auth.service'
 import { ConfigModule } from '../config/config.module'
 import { ConfigService } from '../config/config.service'
+import { GqlLoggerService } from '../logger/gql-logger.service'
+import { LoggerModule } from './../logger/logger.module'
 import { CORS_OPTIONS } from './../main'
 import { DefaultResolver } from './default.resolver'
 import { GqlContext } from './types/gql-context.type'
@@ -15,11 +15,12 @@ import { GqlContext } from './types/gql-context.type'
 @Module({
   imports: [
     GraphQLModule.forRootAsync({
-      imports: [AuthModule, ConfigModule],
-      inject: [AuthService, ConfigService],
+      imports: [AuthModule, ConfigModule, LoggerModule],
+      inject: [AuthService, ConfigService, GqlLoggerService],
       useFactory: async (
         authService: AuthService,
-        configService: ConfigService
+        configService: ConfigService,
+        loggerService: GqlLoggerService
       ) => ({
         autoSchemaFile: 'schema.gql',
         path: '/api',
@@ -44,6 +45,8 @@ import { GqlContext } from './types/gql-context.type'
           }
         },
         context: async ({ req, res, connection }): Promise<GqlContext> => {
+          loggerService.logRequest(req)
+
           // Get socket connection metadata, if available (subscriptions only)
           let conn
           if (connection) conn = connection.context
@@ -65,15 +68,11 @@ import { GqlContext } from './types/gql-context.type'
           }
         },
         formatError: error => {
-          // logFormatter('ERR', error, 'red')
-          const { stacktrace } = error.extensions.exception
-          console.error(
-            chalk.red(inspect(stacktrace, { depth: null, showHidden: true }))
-          )
+          loggerService.logError(error)
           return error
         },
         formatResponse: res => {
-          // if (res.data) logFormatter('RES', res.data, 'green')
+          loggerService.logResponse(res)
           return res
         }
       })

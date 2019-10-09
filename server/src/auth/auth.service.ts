@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import * as bcrypt from 'bcryptjs'
-import { Request, Response } from 'express'
+import { CookieOptions, Request, Response } from 'express'
 import { sign, verify } from 'jsonwebtoken'
 import { GqlContext } from '../api/types/gql-context.type'
 import { ConfigService } from '../config/config.service'
@@ -14,11 +14,20 @@ export class AuthService {
   static REFRESH_COOKIE_MAX_AGE = 1000 * 60 * 60 * 24 * 14 // 14 days
   static REFRESH_COOKIE_NAME = 'rid'
   static REFRESH_COOKIE_PATH = '/refresh_access'
+  private readonly REFRESH_COOKIE_OPTIONS: CookieOptions
 
   constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService
-  ) {}
+  ) {
+    this.REFRESH_COOKIE_OPTIONS = {
+      maxAge: AuthService.REFRESH_COOKIE_MAX_AGE,
+      path: `/auth${AuthService.REFRESH_COOKIE_PATH}`,
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: this.configService.isProduction() // Require HTTPS only in production
+    }
+  }
 
   // EMAIL + PASSWORD
   // ================
@@ -56,8 +65,8 @@ export class AuthService {
   }
 
   validateAccessToken(token: string, ignoreExpiration: boolean = false) {
-    const invalidAccessToken = (err?) =>
-      new UnauthorizedException('INVALID_ACCESS_TOKEN', err)
+    const invalidAccessToken = () =>
+      new UnauthorizedException('INVALID_ACCESS_TOKEN')
 
     try {
       // Verify jwt and get payload
@@ -68,10 +77,8 @@ export class AuthService {
           ignoreExpiration
         }
       )
-
       // Ensure payload contains a userId
       if (!payload.userId) throw invalidAccessToken()
-
       return payload
     } catch (err) {
       throw invalidAccessToken()
@@ -154,16 +161,17 @@ export class AuthService {
   }
 
   setRefreshCookie(token, res: Response) {
-    return res.cookie(AuthService.REFRESH_COOKIE_NAME, token, {
-      maxAge: AuthService.REFRESH_COOKIE_MAX_AGE,
-      path: `/auth${AuthService.REFRESH_COOKIE_PATH}`,
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: this.configService.isProduction() // Require HTTPS only in production
-    })
+    return res.cookie(
+      AuthService.REFRESH_COOKIE_NAME,
+      token,
+      this.REFRESH_COOKIE_OPTIONS
+    )
   }
 
   clearRefreshCookie(res: Response) {
-    return res.clearCookie(AuthService.REFRESH_COOKIE_NAME)
+    return res.clearCookie(
+      AuthService.REFRESH_COOKIE_NAME,
+      this.REFRESH_COOKIE_OPTIONS
+    )
   }
 }

@@ -3,11 +3,13 @@ import { NestFactory } from '@nestjs/core'
 import { useContainer } from 'class-validator'
 import * as cookieParser from 'cookie-parser'
 import * as helmet from 'helmet'
+import * as morgan from 'morgan'
 import { AppModule } from './app.module'
 
 const CLIENT_HOST = process.env.REACT_APP_CLIENT_HOST || 'localhost'
 const CLIENT_PORT = parseInt(process.env.REACT_APP_CLIENT_PORT, 10) || 3000
 const SERVER_PORT = parseInt(process.env.PORT, 10) || 4000
+const isDev = process.env.NODE_ENV === 'development'
 
 export const CORS_OPTIONS = {
   credentials: true,
@@ -19,6 +21,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: CORS_OPTIONS })
 
   // Global middlewares
+  app.use(morgan(isDev ? 'dev' : 'combined'))
   app.use(helmet())
   app.use(cookieParser())
 

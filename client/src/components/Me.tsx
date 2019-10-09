@@ -7,7 +7,6 @@ const Me: React.FC = () => {
   if (loading) return <div>Loading me...</div>
 
   if (error) {
-    console.log(error)
     return null
   }
 

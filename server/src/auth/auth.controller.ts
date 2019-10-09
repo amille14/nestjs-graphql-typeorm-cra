@@ -1,5 +1,7 @@
 import {
   Controller,
+  Delete,
+  Get,
   Post,
   Req,
   Res
@@ -23,6 +25,15 @@ export class AuthController {
     // Create new refresh token and set cookie
     const newRefreshToken = this.authService.generateRefreshToken(user)
     this.authService.setRefreshCookie(newRefreshToken, res)
-    return res.send({ ok: true, accessToken })
+
+    console.log(res)
+
+    return res.send({ accessToken })
+  }
+
+  @Post('/logout')
+  logout(@Res() res: Response) {
+    this.authService.clearRefreshCookie(res)
+    return res.send({ accessToken: '' })
   }
 }
