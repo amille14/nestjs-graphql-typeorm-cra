@@ -66,15 +66,15 @@ import { GqlContext } from './types/gql-context.type'
             conn,
             currentUser
           }
-        },
-        formatError: error => {
-          loggerService.logError(error)
-          return error
-        },
-        formatResponse: res => {
-          loggerService.logResponse(res)
-          return res
         }
+        // formatError: error => {
+        //   loggerService.logError(error)
+        //   return error
+        // },
+        // formatResponse: res => {
+        //   loggerService.logResponse(res)
+        //   return res
+        // }
       })
     })
   ],

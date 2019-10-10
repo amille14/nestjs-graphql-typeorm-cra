@@ -1,4 +1,5 @@
-fragment UserFragment on User {
+fragment User on User {
+  __typename
   id
   createdAt
   updatedAt

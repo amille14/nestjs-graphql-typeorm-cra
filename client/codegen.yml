@@ -10,6 +10,7 @@ generates:
       - 'typescript-operations'
       - 'typescript-react-apollo'
     config:
+      strict: true]
       withHOC: false
       withComponent: false
       withHooks: true
