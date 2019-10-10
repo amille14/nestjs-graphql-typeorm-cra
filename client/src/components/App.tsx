@@ -1,46 +1,33 @@
 import { useApolloClient } from '@apollo/react-hooks'
-import React, { useLayoutEffect, useState } from 'react'
-import { useGetAccessTokenQuery } from '../graphql/generated'
+import React from 'react'
+import { useGetAccessTokenQuery, useMeQuery } from '../graphql/generated'
 import '../styles/app.scss'
-import {
-  handleLogout,
-  handleRefreshAccessToken,
-  logoutRequest,
-  refreshAccessTokenRequest
-  } from '../utils/auth'
-import Me from './Me'
+import { logoutRequest } from '../utils/auth'
 
 const App: React.FC = () => {
   const client = useApolloClient()
-  const [loading, setLoading] = useState(false)
-  const {
-    data: { accessToken }
-  } = useGetAccessTokenQuery() as any
-
-  console.log('RENDER', accessToken)
-
-  // useLayoutEffect(() => {
-  //   if (!accessToken) {
-  //     refreshAccessTokenRequest().then(res => handleRefreshAccessToken(client.cache, res).then(() => setLoading(false)))
-  //   }
-  // }, [])
+  const { data, loading, error } = useMeQuery()
+  useGetAccessTokenQuery() // Listen for logouts
+  const logout = () => logoutRequest().then(res => client.resetStore())
 
   if (loading) return <div>Loading...</div>
+
+  if (error) {
+    // TODO: Show error page
+    return <div>{error}</div>
+  }
+
+  // TODO: Add routes for login/register
+
   return (
     <div className="App">
-      Access Token: {accessToken}
-      <Me />
-      {accessToken && (
-        <a
-          href="#"
-          onClick={() =>
-            logoutRequest()
-              .then(res => handleLogout(client.cache, res))
-              .then(() => client.resetStore())
-          }
-        >
-          logout
-        </a>
+      {data && data.me ? (
+        <div>
+          Logged in as {data.me.email}
+          <button onClick={logout}>Logout</button>
+        </div>
+      ) : (
+        <div>Not logged in</div>
       )}
     </div>
   )

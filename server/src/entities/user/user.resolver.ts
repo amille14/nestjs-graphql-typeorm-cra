@@ -20,8 +20,7 @@ export class UserResolver {
     private readonly pubsub: RedisPubSubService
   ) {}
 
-  @Query(returns => User)
-  @UseGuards(IsAuthenticated)
+  @Query(returns => User, { nullable: true })
   async me(@CurrentUser() user: User): Promise<User> {
     return await this.userService.findOne(user)
   }
@@ -34,10 +33,7 @@ export class UserResolver {
 
   @Mutation(returns => User)
   @UseGuards(IsAuthenticated)
-  async updateUserEmail(
-    @CurrentUser() user: User,
-    @Args('email') email: string
-  ): Promise<User> {
+  async updateUserEmail(@CurrentUser() user: User, @Args('email') email: string): Promise<User> {
     return await this.userService.update(user, { email })
   }
 
@@ -45,10 +41,6 @@ export class UserResolver {
     resolve: payload => payload
   })
   users() {
-    return this.pubsub.asyncIterator([
-      'User_created',
-      'User_updated',
-      'User_deleted'
-    ])
+    return this.pubsub.asyncIterator(['User_created', 'User_updated', 'User_deleted'])
   }
 }

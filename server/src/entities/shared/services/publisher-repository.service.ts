@@ -50,7 +50,8 @@ export abstract class PublisherRepository<Entity extends IdEntity> {
   }
 
   // Find one matching entity
-  async findOne(where: any) {
+  async findOne(where: Partial<Entity>) {
+    if (!where) return Promise.resolve(null)
     return this.repo.findOne({ where })
   }
 

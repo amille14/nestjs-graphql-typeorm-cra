@@ -1,12 +1,12 @@
 import { onError } from 'apollo-link-error'
 import { promiseToObservable } from '../../utils/helpers'
 import {
-  handleLogout,
-  handleRefreshAccessToken,
+  // handleLogout,
+  // handleRefreshAccessToken,
   logoutRequest,
   refreshAccessTokenRequest,
   setAccessToken
-  } from './../../utils/auth'
+} from './../../utils/auth'
 
 export const createErrorLink = () => {
   return onError(({ graphQLErrors, networkError, operation, forward }) => {

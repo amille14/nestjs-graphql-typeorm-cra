@@ -65,18 +65,13 @@ export class AuthService {
   }
 
   validateAccessToken(token: string, ignoreExpiration: boolean = false) {
-    const invalidAccessToken = () =>
-      new UnauthorizedException('INVALID_ACCESS_TOKEN')
+    const invalidAccessToken = () => new UnauthorizedException('INVALID_ACCESS_TOKEN')
 
     try {
       // Verify jwt and get payload
-      const payload: any = verify(
-        token,
-        this.configService.get('ACCESS_TOKEN_SECRET'),
-        {
-          ignoreExpiration
-        }
-      )
+      const payload: any = verify(token, this.configService.get('ACCESS_TOKEN_SECRET'), {
+        ignoreExpiration
+      })
       // Ensure payload contains a userId
       if (!payload.userId) throw invalidAccessToken()
       return payload
@@ -87,8 +82,7 @@ export class AuthService {
 
   // Get bearer token from request's Authorization header
   getAccessTokenFromRequest(req: Request): string {
-    const authHeader = (req.headers.authorization ||
-      req.headers.Authorization) as string
+    const authHeader = (req.headers.authorization || req.headers.Authorization) as string
     return authHeader ? authHeader.replace('Bearer ', '') : ''
   }
 
@@ -99,17 +93,12 @@ export class AuthService {
 
   // Get access token from graphql context
   getAccessTokenFromContext({ req, conn }: GqlContext): string {
-    return conn
-      ? this.getAccessTokenFromConnection(conn)
-      : this.getAccessTokenFromRequest(req)
+    return conn ? this.getAccessTokenFromConnection(conn) : this.getAccessTokenFromRequest(req)
   }
 
   getUserFromToken(accessToken: string) {
     try {
-      const { userId }: any = verify(
-        accessToken,
-        this.configService.get('ACCESS_TOKEN_SECRET')
-      )
+      const { userId }: any = verify(accessToken, this.configService.get('ACCESS_TOKEN_SECRET'))
       return this.userService.build({ id: userId })
     } catch (err) {
       return null
@@ -127,8 +116,7 @@ export class AuthService {
   }
 
   async validateRefreshToken(token: string): Promise<User> {
-    const invalidRefreshToken = (err?) =>
-      new UnauthorizedException('INVALID_REFRESH_TOKEN', err)
+    const invalidRefreshToken = (err?) => new UnauthorizedException('INVALID_REFRESH_TOKEN', err)
 
     // Verify jwt
     let payload: any
@@ -141,7 +129,7 @@ export class AuthService {
     // Ensure user exists and token versions match
     if (!payload) throw invalidRefreshToken()
     const { userId, tokenVersion } = payload
-    const user = await this.userService.findOne({ where: { id: userId } })
+    const user = await this.userService.findOne({ id: userId })
     if (!user || tokenVersion !== user.tokenVersion) {
       throw invalidRefreshToken()
     }
@@ -161,11 +149,7 @@ export class AuthService {
   }
 
   setRefreshCookie(token, res: Response) {
-    return res.cookie(
-      AuthService.REFRESH_COOKIE_NAME,
-      token,
-      this.REFRESH_COOKIE_OPTIONS
-    )
+    return res.cookie(AuthService.REFRESH_COOKIE_NAME, token, this.REFRESH_COOKIE_OPTIONS)
   }
 
   clearRefreshCookie(res: Response) {

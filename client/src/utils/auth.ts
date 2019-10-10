@@ -25,34 +25,34 @@ export const logoutRequest = (): Promise<any> => {
   return fetch(`http://${HOST}:${PORT}/auth/logout`, { method: 'POST', credentials: 'include' })
 }
 
-export const handleLogout = (cache: ApolloCache<any>, res: Response) => {
-  setAccessToken(cache, '')
-  console.info('%c[Logged out!]', 'color: lightgreen;')
-  return res
-}
+// export const handleLogout = (cache: ApolloCache<any>, res: Response) => {
+//   setAccessToken(cache, '')
+//   console.info('%c[Logged out!]', 'color: lightgreen;')
+//   return res
+// }
 
 export const refreshAccessTokenRequest = (): Promise<any> => {
   console.info('%c[Re-authenticating...]', 'color: lightskyblue;')
   return fetch(`http://${HOST}:${PORT}/auth/refresh_access`, { method: 'POST', credentials: 'include' })
 }
 
-export const handleRefreshAccessToken = (cache: ApolloCache<any>, res: Response) => {
-  return res.json().then(json => {
-    switch (res.status) {
-      case 200:
-      case 201:
-        const { accessToken } = json
-        setAccessToken(cache, accessToken)
-        console.info('%c[Authenticated!]', 'color: lightgreen;')
-        break
-      case 401:
-        const { message } = json
-        logoutRequest().then(res => handleLogout(cache, res))
-        break
-      default:
-        throw new Error(res.statusText)
-    }
+// export const handleRefreshAccessToken = (cache: ApolloCache<any>, res: Response) => {
+//   return res.json().then(json => {
+//     switch (res.status) {
+//       case 200:
+//       case 201:
+//         const { accessToken } = json
+//         setAccessToken(cache, accessToken)
+//         console.info('%c[Authenticated!]', 'color: lightgreen;')
+//         break
+//       case 401:
+//         const { message } = json
+//         logoutRequest().then(res => handleLogout(cache, res))
+//         break
+//       default:
+//         throw new Error(res.statusText)
+//     }
 
-    return res
-  })
-}
+//     return res
+//   })
+// }

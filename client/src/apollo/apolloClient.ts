@@ -8,8 +8,8 @@ import { createLoggerLink } from './links/logger.link'
 import { createRefreshLink } from './links/refresh.link'
 import { defaults, resolvers } from './state'
 
-export const initLocalStore = (cache: InMemoryCache) => {
-  return cache.writeData({ data: defaults })
+export const initLocalStore = (client: ApolloClient<InMemoryCache>) => {
+  return client.writeData({ data: defaults })
 }
 
 export const createApolloClient = () => {
@@ -17,12 +17,13 @@ export const createApolloClient = () => {
   const cache = new InMemoryCache()
 
   // Setup Apollo client
-  const client = new ApolloClient({
+  let client
+  client = new ApolloClient({
     cache,
     resolvers,
     link: ApolloLink.from([
       createLoggerLink(),
-      createRefreshLink(cache),
+      createRefreshLink(cache, client),
       createAuthLink(),
       createErrorLink(),
       createHybridLink(cache)
@@ -31,8 +32,8 @@ export const createApolloClient = () => {
   })
 
   // Setup local state
-  initLocalStore(cache)
-  client.onResetStore(async () => initLocalStore(cache))
+  initLocalStore(client)
+  client.onResetStore(async () => initLocalStore(client))
 
   return client
 }
