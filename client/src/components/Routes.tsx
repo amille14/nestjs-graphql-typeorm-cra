@@ -8,6 +8,8 @@ import {
   } from 'react-router-dom'
 import { useMeQuery } from '../graphql/generated'
 import { logoutRequest } from '../utils/auth'
+import LoginForm from './Auth/LoginForm'
+import RegisterForm from './Auth/RegisterForm'
 import ErrorPage from './ErrorPage/ErrorPage'
 import MainPage from './MainPage/MainPage'
 
@@ -33,9 +35,19 @@ const Routes: React.FC<Props> = () => {
         <div>Not logged in</div>
       )}
       <Router>
-        <Switch>
-          <Route path="/" component={MainPage} />
-        </Switch>
+        {isAuthenticated ? (
+          <Switch>
+            <Redirect exact from="/signup" to="/" />
+            <Redirect exact from="/login" to="/" />
+            <Route path="/" component={MainPage} />
+          </Switch>
+        ) : (
+          <Switch>
+            <Route exact path="/signup" component={RegisterForm} />
+            <Route exact path="/login" component={LoginForm} />
+            <Route path="/" component={MainPage} />
+          </Switch>
+        )}
       </Router>
     </>
   )

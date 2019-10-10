@@ -35,13 +35,15 @@ const RegisterForm: React.FC<Props> = () => {
         cache.writeQuery({ query: MeDocument, data: { me: user } })
         setSubmitting(false)
       }
-    }).catch(() => {
+    }).catch(err => {
+      console.error(err)
       setSubmitting(false)
     })
   }
 
   return (
     <div className="RegisterForm">
+      <h4>Sign up</h4>
       <Formik
         initialValues={{ email: '', password: '' }}
         validate={validateForm}

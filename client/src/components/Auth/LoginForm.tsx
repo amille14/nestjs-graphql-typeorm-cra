@@ -43,6 +43,7 @@ const LoginForm: React.FC<Props> = () => {
 
   return (
     <div className="LoginForm">
+      <h4>Log in</h4>
       <Formik
         initialValues={{ email: '', password: '' }}
         validate={validateForm}
