@@ -149,16 +149,13 @@ export class AuthService {
   }
 
   setRefreshCookie(token, res: Response) {
-    return res.cookie(AuthService.REFRESH_COOKIE_NAME, token, {
-      maxAge: AuthService.REFRESH_COOKIE_MAX_AGE,
-      path: `/auth${AuthService.REFRESH_COOKIE_PATH}`,
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: this.configService.isProduction() // Require HTTPS only in production
-    })
+    return res.cookie(AuthService.REFRESH_COOKIE_NAME, token, this.REFRESH_COOKIE_OPTIONS)
   }
 
   clearRefreshCookie(res: Response) {
-    return res.clearCookie(AuthService.REFRESH_COOKIE_NAME, this.REFRESH_COOKIE_OPTIONS)
+    return res.clearCookie(AuthService.REFRESH_COOKIE_NAME, {
+      ...this.REFRESH_COOKIE_OPTIONS,
+      maxAge: -1
+    })
   }
 }

@@ -8,6 +8,7 @@ import {
   refreshAccessTokenRequest,
   setAccessToken
   } from '../../utils/auth'
+import { logFailure, logSuccess } from '../../utils/log'
 
 export const createRefreshLink = (cache: ApolloCache<any>, client: ApolloClient<any>) => {
   return new TokenRefreshLink({
@@ -15,17 +16,17 @@ export const createRefreshLink = (cache: ApolloCache<any>, client: ApolloClient<
     isTokenValidOrUndefined: () => {
       const accessToken = getAccessToken(cache)
       if (!accessToken) return true
-      // Check if token has expired
       const decoded: any = decode(accessToken)
-      return decoded && decoded.exp <= Date.now()
+      const isValid = decoded && decoded.userId && decoded.exp * 1000 > Date.now()
+      return isValid
     },
     fetchAccessToken: () => refreshAccessTokenRequest(),
     handleFetch: (accessToken: string) => {
       setAccessToken(cache, accessToken)
-      console.info('%c[Authenticated!]', 'color: lightgreen;')
+      logSuccess('Authenticated!')
     },
     handleError: (err: any) => {
-      console.info('%c[Authentication failed.]', 'color: indianred;')
+      logFailure('Authentication failed.')
       if (err.statusCode === 401) {
         return logoutRequest().then(res => client.resetStore())
       }

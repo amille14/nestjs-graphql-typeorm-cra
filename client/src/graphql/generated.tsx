@@ -51,7 +51,7 @@ export type MutationLoginArgs = {
 
 
 export type MutationSetAccessTokenArgs = {
-  token: Scalars['String']
+  accessToken: Scalars['String']
 };
 
 export enum MutationEventType {
@@ -143,7 +143,7 @@ export type GetAccessTokenQuery = (
 );
 
 export type SetAccessTokenMutationVariables = {
-  token: Scalars['String']
+  accessToken: Scalars['String']
 };
 
 
@@ -296,8 +296,8 @@ export type GetAccessTokenQueryHookResult = ReturnType<typeof useGetAccessTokenQ
 export type GetAccessTokenLazyQueryHookResult = ReturnType<typeof useGetAccessTokenLazyQuery>;
 export type GetAccessTokenQueryResult = ApolloReactCommon.QueryResult<GetAccessTokenQuery, GetAccessTokenQueryVariables>;
 export const SetAccessTokenDocument = gql`
-    mutation setAccessToken($token: String!) {
-  setAccessToken(token: $token) @client
+    mutation setAccessToken($accessToken: String!) {
+  setAccessToken(accessToken: $accessToken) @client
 }
     `;
 export type SetAccessTokenMutationFn = ApolloReactCommon.MutationFunction<SetAccessTokenMutation, SetAccessTokenMutationVariables>;
@@ -315,7 +315,7 @@ export type SetAccessTokenMutationFn = ApolloReactCommon.MutationFunction<SetAcc
  * @example
  * const [setAccessTokenMutation, { data, loading, error }] = useSetAccessTokenMutation({
  *   variables: {
- *      token: // value for 'token'
+ *      accessToken: // value for 'accessToken'
  *   },
  * });
  */

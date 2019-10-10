@@ -1,31 +1,47 @@
-import { useApolloClient } from '@apollo/react-hooks'
-import React from 'react'
-import { useGetAccessTokenQuery, useMeQuery, UserPartial } from '../graphql/generated'
+import React, { useEffect, useState } from 'react'
+import { useSetAccessTokenMutation } from '../graphql/generated'
 import '../styles/app.scss'
-import { logoutRequest } from '../utils/auth'
+import { refreshAccessTokenRequest } from '../utils/auth'
+import { logFailure, logSuccess } from '../utils/log'
 import ErrorPage from './ErrorPage/ErrorPage'
 import Routes from './Routes'
 
 const App: React.FC = () => {
-  const client = useApolloClient()
-  const { data, loading, error } = useMeQuery()
-  useGetAccessTokenQuery() // Listen for logouts
-  const logout = () => logoutRequest().then(res => client.resetStore())
-  const loggedIn = !!(data && data.me)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [setAccessToken] = useSetAccessTokenMutation()
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <ErrorPage />
+  // On initial page load, attempt to fetch a valid access token
+  useEffect(() => {
+    refreshAccessTokenRequest()
+      .then(async res => {
+        switch (res.status) {
+          case 200:
+          case 201:
+            const { accessToken } = await res.json()
+            await setAccessToken({ variables: { accessToken } })
+            logSuccess('Authenticated!')
+            break
+          case 401:
+          default:
+            await setAccessToken({ variables: { accessToken: '' } })
+            logFailure('Authentication failed. Continuing as unauthenticated user.')
+        }
+        setLoading(false)
+      })
+      .catch(error => {
+        setError(error)
+        setLoading(false)
+      })
+  }, [])
+
   return (
     <div className="App">
-      {loggedIn ? (
-        <div>
-          Logged in as {data!.me!.email}
-          <button onClick={logout}>Log out</button>
-        </div>
+      {loading ? (
+        <div>Loading...</div>
       ) : (
-        <div>Not logged in</div>
+        <div>{error ? <ErrorPage error={error} /> : <Routes />}</div>
       )}
-      <Routes loggedIn={loggedIn} />
     </div>
   )
 }

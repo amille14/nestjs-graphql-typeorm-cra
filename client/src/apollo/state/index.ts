@@ -8,8 +8,8 @@ export const defaults = {
 export const resolvers = {
   Query: {},
   Mutation: {
-    setAccessToken: (_: any, { token }: any, { cache }: any) => {
-      cache.writeData({ data: { accessToken: token } })
+    setAccessToken: (_: any, { accessToken }: any, { cache }: any) => {
+      cache.writeData({ data: { accessToken } })
     },
     generateClientId: (_: any, __: any, { cache }: any) => {
       cache.writeData({ data: { clientId: cuid() } })

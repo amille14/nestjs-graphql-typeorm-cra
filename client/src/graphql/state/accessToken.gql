@@ -3,13 +3,13 @@ type Query {
 }
 
 type Mutation {
-  setAccessToken(token: String!): String!
+  setAccessToken(accessToken: String!): String!
 }
 
 query getAccessToken {
   accessToken @client
 }
 
-mutation setAccessToken($token: String!) {
-  setAccessToken(token: $token) @client
+mutation setAccessToken($accessToken: String!) {
+  setAccessToken(accessToken: $accessToken) @client
 }

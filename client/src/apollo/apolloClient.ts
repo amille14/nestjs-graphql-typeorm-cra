@@ -22,10 +22,10 @@ export const createApolloClient = () => {
     cache,
     resolvers,
     link: ApolloLink.from([
-      // createLoggerLink(),
-      // createRefreshLink(cache, client),
-      // createAuthLink(),
-      // createErrorLink(),
+      createLoggerLink(),
+      createRefreshLink(cache, client),
+      createAuthLink(),
+      createErrorLink(),
       createHybridLink(cache)
     ]),
     connectToDevTools: true
