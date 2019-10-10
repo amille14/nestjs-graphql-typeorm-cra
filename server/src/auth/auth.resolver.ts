@@ -47,13 +47,6 @@ export class AuthResolver {
 
   @Mutation(returns => Boolean)
   @UseGuards(IsAuthenticated)
-  logout(@Context() { res }: GqlContext) {
-    this.authService.clearRefreshCookie(res)
-    return true
-  }
-
-  @Mutation(returns => Boolean)
-  @UseGuards(IsAuthenticated)
   async logoutOtherClients(
     @CurrentUser() user: User,
     @Context() { res }: GqlContext

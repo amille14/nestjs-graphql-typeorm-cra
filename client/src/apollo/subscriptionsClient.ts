@@ -9,7 +9,7 @@ const API_SUBSCRIPTIONS_ENDPOINT = `ws://${SERVER_HOST}:${SERVER_PORT}/api`
 export const createSubscriptionsClient = (cache: ApolloCache<any>): SubscriptionClient => {
   const subscriptionsClient: any = new SubscriptionClient(API_SUBSCRIPTIONS_ENDPOINT, {
     reconnect: true,
-    // lazy: true,
+    lazy: true,
     connectionParams: () => ({
       accessToken: getAccessToken(cache),
       clientId: getClientId(cache)

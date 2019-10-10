@@ -26,7 +26,6 @@ export type Mutation = {
   updateUserEmail: User,
   register: LoginPayload,
   login: LoginPayload,
-  logout: Scalars['Boolean'],
   logoutOtherClients: Scalars['Boolean'],
   default: Scalars['String'],
   setAccessToken: Scalars['String'],
@@ -65,7 +64,7 @@ export type Query = {
    __typename?: 'Query',
   me: User,
   default: Scalars['String'],
-  accessToken?: Maybe<Scalars['String']>,
+  accessToken: Scalars['String'],
   clientId: Scalars['String'],
 };
 
@@ -140,11 +139,23 @@ export type MeQuery = (
   { __typename?: 'Query' }
   & { me: (
     { __typename?: 'User' }
-    & Pick<User, 'id' | 'email'>
+    & UserFragmentFragment
   ) }
 );
 
+export type UserFragmentFragment = (
+  { __typename?: 'User' }
+  & Pick<User, 'id' | 'createdAt' | 'updatedAt' | 'email'>
+);
 
+export const UserFragmentFragmentDoc = gql`
+    fragment UserFragment on User {
+  id
+  createdAt
+  updatedAt
+  email
+}
+    `;
 export const GetAccessTokenDocument = gql`
     query getAccessToken {
   accessToken @client
@@ -267,11 +278,10 @@ export type GenerateClientIdMutationOptions = ApolloReactCommon.BaseMutationOpti
 export const MeDocument = gql`
     query me {
   me {
-    id
-    email
+    ...UserFragment
   }
 }
-    `;
+    ${UserFragmentFragmentDoc}`;
 
 /**
  * __useMeQuery__

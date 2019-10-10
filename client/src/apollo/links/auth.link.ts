@@ -7,6 +7,9 @@ export const createAuthLink = () => {
     operation.setContext((context: Context) => {
       const { cache } = context
       const accessToken = getAccessToken(cache)
+      console.log('OP', operation)
+      console.log(accessToken)
+      console.log(cache)
       return {
         ...context,
         headers: {

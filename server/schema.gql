@@ -18,7 +18,6 @@ type Mutation {
   updateUserEmail(email: String!): User!
   register(email: String!, password: String!): LoginPayload!
   login(email: String!, password: String!): LoginPayload!
-  logout: Boolean!
   logoutOtherClients: Boolean!
   default: String!
 }

@@ -169,9 +169,9 @@ export class AuthService {
   }
 
   clearRefreshCookie(res: Response) {
-    return res.clearCookie(
-      AuthService.REFRESH_COOKIE_NAME,
-      this.REFRESH_COOKIE_OPTIONS
-    )
+    return res.clearCookie(AuthService.REFRESH_COOKIE_NAME, {
+      ...this.REFRESH_COOKIE_OPTIONS,
+      maxAge: 0
+    })
   }
 }

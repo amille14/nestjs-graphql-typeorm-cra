@@ -1,5 +1,4 @@
 import { ApolloCache } from 'apollo-cache'
-import { ApolloClient } from 'apollo-client'
 import { GetAccessTokenDocument, GetClientIdDocument } from '../graphql/generated'
 
 const HOST = process.env.REACT_APP_SERVER_HOST
@@ -15,38 +14,45 @@ export const getAccessToken = (cache: ApolloCache<any>) => {
   return data ? data.accessToken : null
 }
 
-export const setAccessToken = (client: ApolloClient<any>, accessToken: string) => {
+export const setAccessToken = (cache: ApolloCache<any>, accessToken: string) => {
   // Use client.writeQuery instead of cache.writeQuery to ensure UI updates
-  client.writeQuery({ query: GetAccessTokenDocument, data: { accessToken } })
+  cache.writeQuery({ query: GetAccessTokenDocument, data: { accessToken } })
   return accessToken
 }
 
-export const refreshAccessToken = (client: ApolloClient<any>): Promise<any> => {
-  console.info('%c[Re-authenticating...]', 'color: lightskyblue;')
-  return fetch(`http://${HOST}:${PORT}/auth/refresh_access`, { method: 'POST', credentials: 'include' }).then(res => {
-    return res.json().then(({ statusCode, accessToken }) => {
-      switch (statusCode) {
-        case 200:
-          setAccessToken(client, accessToken)
-          console.info('%c[Authenticated!]', 'color: lightgreen;')
-          break
-        case 401:
-          logout(client)
-          break
-        default:
-          throw new Error(res.statusText)
-      }
-
-      return res
-    })
-  })
+export const logoutRequest = (): Promise<any> => {
+  console.info('%c[Logging out...]', 'color: lightskyblue;')
+  return fetch(`http://${HOST}:${PORT}/auth/logout`, { method: 'POST', credentials: 'include' })
 }
 
-export const logout = (client: ApolloClient<any>): Promise<any> => {
-  console.info('%c[Logging out...]', 'color: lightskyblue;')
-  return fetch(`http://${HOST}:${PORT}/auth/logout`, { method: 'POST', credentials: 'include' }).then(res => {
-    setAccessToken(client, '')
-    console.info('%c[Logged out!]', 'color: lightgreen;')
+export const handleLogout = (cache: ApolloCache<any>, res: Response) => {
+  setAccessToken(cache, '')
+  console.info('%c[Logged out!]', 'color: lightgreen;')
+  return res
+}
+
+export const refreshAccessTokenRequest = (): Promise<any> => {
+  console.info('%c[Re-authenticating...]', 'color: lightskyblue;')
+  return fetch(`http://${HOST}:${PORT}/auth/refresh_access`, { method: 'POST', credentials: 'include' })
+}
+
+export const handleRefreshAccessToken = (cache: ApolloCache<any>, res: Response) => {
+  return res.json().then(json => {
+    switch (res.status) {
+      case 200:
+      case 201:
+        const { accessToken } = json
+        setAccessToken(cache, accessToken)
+        console.info('%c[Authenticated!]', 'color: lightgreen;')
+        break
+      case 401:
+        const { message } = json
+        logoutRequest().then(res => handleLogout(cache, res))
+        break
+      default:
+        throw new Error(res.statusText)
+    }
+
     return res
   })
 }

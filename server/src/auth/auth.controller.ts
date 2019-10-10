@@ -26,8 +26,6 @@ export class AuthController {
     const newRefreshToken = this.authService.generateRefreshToken(user)
     this.authService.setRefreshCookie(newRefreshToken, res)
 
-    console.log(res)
-
     return res.send({ accessToken })
   }
 

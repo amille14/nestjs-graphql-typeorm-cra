@@ -1,25 +1,31 @@
-import ApolloClient from 'apollo-client'
+import { ApolloCache } from 'apollo-cache'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
-import { getAccessToken, logout, refreshAccessToken } from '../../utils/auth'
+import { decode } from 'jsonwebtoken'
+import { getAccessToken, refreshAccessTokenRequest, setAccessToken } from '../../utils/auth'
+import { handleLogout, logoutRequest } from './../../utils/auth'
 
-export const createRefreshLink = (client: ApolloClient<any>) => {
+export const createRefreshLink = (cache: ApolloCache<any>) => {
   return new TokenRefreshLink({
     accessTokenField: 'accessToken',
     isTokenValidOrUndefined: () => {
-      const accessToken = getAccessToken(client.cache)
-      console.log('TOKEN', accessToken)
-      return !accessToken
+      const accessToken = getAccessToken(cache)
+
+      if (accessToken !== undefined) {
+        const decoded: any = decode(accessToken)
+        if (decoded && decoded.exp <= Date.now()) return true
+      }
+
+      return false
     },
-    fetchAccessToken: () => {
-      console.log('FETCH')
-      return refreshAccessToken(client)
+    fetchAccessToken: () => refreshAccessTokenRequest(),
+    handleFetch: (accessToken: string) => {
+      setAccessToken(cache, accessToken)
+      console.info('%c[Authenticated!]', 'color: lightgreen;')
     },
-    handleFetch: accessToken => {
-      console.log(accessToken)
-    },
-    handleError: err => {
-      console.log(err)
-      logout(client)
+    handleError: (err: any) => {
+      if (err.statusCode === 401) {
+        return logoutRequest().then(res => handleLogout(cache, res))
+      }
     }
   })
 }
