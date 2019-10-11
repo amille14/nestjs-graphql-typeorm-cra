@@ -38,14 +38,7 @@ export class UserResolver {
   }
 
   @Subscription(returns => UserMutationPayload, {
-    resolve: payload => {
-      // TODO: WHY DOES THIS REQUIRE EXPLICIT DATE CONVERSION?
-
-      payload.entity.createdAt = new Date(payload.entity.createdAt)
-      payload.entity.updatedAt = new Date(payload.entity.updatedAt)
-
-      return payload
-    }
+    resolve: payload => payload
   })
   users() {
     return this.pubsub.asyncIterator(['User_created', 'User_updated', 'User_deleted'])

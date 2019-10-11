@@ -5,6 +5,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn
   } from 'typeorm'
+import { DateTimeScalar } from './../scalars/datetime.scalar'
 import cuid = require('cuid')
 
 // Base class for all entities

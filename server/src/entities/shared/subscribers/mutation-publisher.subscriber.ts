@@ -9,6 +9,7 @@ import {
   UpdateEvent
   } from 'typeorm'
 import { RedisPubSubService } from '../../../db/redis/redis-pubsub.service'
+import { IdEntity } from '../types/id-entity.types'
 import { MutationPayload, MutationType } from '../types/mutation-payload.types'
 
 // Listen for "insert", "update", and "delete" events on all entities and
@@ -16,7 +17,7 @@ import { MutationPayload, MutationType } from '../types/mutation-payload.types'
 
 @EventSubscriber()
 @Injectable()
-export class MutationPublisherSubscriber implements EntitySubscriberInterface<any> {
+export class MutationPublisherSubscriber implements EntitySubscriberInterface<IdEntity> {
   constructor(
     @InjectConnection() private readonly connection: Connection,
     @Inject('RedisPubSubService') private readonly pubsub: RedisPubSubService
@@ -24,15 +25,19 @@ export class MutationPublisherSubscriber implements EntitySubscriberInterface<an
     connection.subscribers.push(this)
   }
 
+  listenTo() {
+    return IdEntity
+  }
+
   publishMutation(
     mutationType: MutationType,
-    event: InsertEvent<any> | UpdateEvent<any> | RemoveEvent<any>
+    event: InsertEvent<IdEntity> | UpdateEvent<IdEntity> | RemoveEvent<IdEntity>
   ) {
     const {
-      metadata: { target, targetName }
+      metadata: { targetName }
     } = event
 
-    const mutation: MutationPayload<any> = {
+    const mutation: MutationPayload<IdEntity> = {
       mutation: mutationType,
       entity: mutationType === MutationType.DELETE ? (event as any).databaseEntity : event.entity
     }
@@ -48,21 +53,20 @@ export class MutationPublisherSubscriber implements EntitySubscriberInterface<an
   }
 
   // Store entity changes before updating
-  async beforeUpdate(event: UpdateEvent<any>) {
-    const { entity, databaseEntity } = event
-    if (!entity.changes) event.entity.changes = { ...entity }
+  async beforeUpdate(event: UpdateEvent<IdEntity>) {
+    if (!event.entity.changes) event.entity.changes = { ...event.entity }
     delete event.entity.changes.id
   }
 
-  async afterInsert(event: InsertEvent<any>) {
+  async afterInsert(event: InsertEvent<IdEntity>) {
     this.publishMutation(MutationType.INSERT, event)
   }
 
-  async afterUpdate(event: UpdateEvent<any>) {
+  async afterUpdate(event: UpdateEvent<IdEntity>) {
     this.publishMutation(MutationType.UPDATE, event)
   }
 
-  async afterRemove(event: RemoveEvent<any>) {
+  async afterRemove(event: RemoveEvent<IdEntity>) {
     this.publishMutation(MutationType.DELETE, event)
   }
 }

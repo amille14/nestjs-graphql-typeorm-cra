@@ -4,9 +4,10 @@ import { AuthModule } from '../auth/auth.module'
 import { AuthService } from '../auth/auth.service'
 import { ConfigModule } from '../config/config.module'
 import { ConfigService } from '../config/config.service'
+import { DateTimeScalar } from '../entities/shared/scalars/datetime.scalar'
 import { GqlLoggerService } from '../logger/gql-logger.service'
-import { LoggerModule } from './../logger/logger.module'
-import { CORS_OPTIONS } from './../main'
+import { LoggerModule } from '../logger/logger.module'
+import { CORS_OPTIONS } from '../main'
 import { DefaultResolver } from './default.resolver'
 import { GqlContext } from './types/gql-context.type'
 
@@ -78,6 +79,6 @@ import { GqlContext } from './types/gql-context.type'
       })
     })
   ],
-  providers: [DefaultResolver]
+  providers: [DefaultResolver, DateTimeScalar]
 })
 export class ApiModule {}
