@@ -29,7 +29,6 @@ export type Mutation = {
   logoutOtherClients: Scalars['Boolean'],
   default: Scalars['String'],
   setAccessToken: Scalars['String'],
-  generateClientId: Scalars['String'],
 };
 
 
@@ -142,16 +141,6 @@ export type GetAccessTokenQuery = (
   & Pick<Query, 'accessToken'>
 );
 
-export type SetAccessTokenMutationVariables = {
-  accessToken: Scalars['String']
-};
-
-
-export type SetAccessTokenMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'setAccessToken'>
-);
-
 export type GetClientIdQueryVariables = {};
 
 
@@ -160,12 +149,14 @@ export type GetClientIdQuery = (
   & Pick<Query, 'clientId'>
 );
 
-export type GenerateClientIdMutationVariables = {};
+export type SetAccessTokenMutationVariables = {
+  accessToken: Scalars['String']
+};
 
 
-export type GenerateClientIdMutation = (
+export type SetAccessTokenMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Mutation, 'generateClientId'>
+  & Pick<Mutation, 'setAccessToken'>
 );
 
 export type MeQueryVariables = {};
@@ -182,6 +173,21 @@ export type MeQuery = (
 export type UserFragment = (
   { __typename: 'User' }
   & Pick<User, 'id' | 'createdAt' | 'updatedAt' | 'email'>
+);
+
+export type UsersSubscriptionVariables = {};
+
+
+export type UsersSubscription = (
+  { __typename?: 'Subscription' }
+  & { users: (
+    { __typename?: 'UserMutationPayload' }
+    & Pick<UserMutationPayload, 'mutation' | 'updatedFields'>
+    & { entity: (
+      { __typename?: 'User' }
+      & UserFragment
+    ) }
+  ) }
 );
 
 export const UserFragmentDoc = gql`
@@ -266,7 +272,7 @@ export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = ApolloReactCommon.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = ApolloReactCommon.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
 export const GetAccessTokenDocument = gql`
-    query getAccessToken {
+    query GetAccessToken {
   accessToken @client
 }
     `;
@@ -295,38 +301,8 @@ export function useGetAccessTokenLazyQuery(baseOptions?: ApolloReactHooks.LazyQu
 export type GetAccessTokenQueryHookResult = ReturnType<typeof useGetAccessTokenQuery>;
 export type GetAccessTokenLazyQueryHookResult = ReturnType<typeof useGetAccessTokenLazyQuery>;
 export type GetAccessTokenQueryResult = ApolloReactCommon.QueryResult<GetAccessTokenQuery, GetAccessTokenQueryVariables>;
-export const SetAccessTokenDocument = gql`
-    mutation setAccessToken($accessToken: String!) {
-  setAccessToken(accessToken: $accessToken) @client
-}
-    `;
-export type SetAccessTokenMutationFn = ApolloReactCommon.MutationFunction<SetAccessTokenMutation, SetAccessTokenMutationVariables>;
-
-/**
- * __useSetAccessTokenMutation__
- *
- * To run a mutation, you first call `useSetAccessTokenMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSetAccessTokenMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [setAccessTokenMutation, { data, loading, error }] = useSetAccessTokenMutation({
- *   variables: {
- *      accessToken: // value for 'accessToken'
- *   },
- * });
- */
-export function useSetAccessTokenMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SetAccessTokenMutation, SetAccessTokenMutationVariables>) {
-        return ApolloReactHooks.useMutation<SetAccessTokenMutation, SetAccessTokenMutationVariables>(SetAccessTokenDocument, baseOptions);
-      }
-export type SetAccessTokenMutationHookResult = ReturnType<typeof useSetAccessTokenMutation>;
-export type SetAccessTokenMutationResult = ApolloReactCommon.MutationResult<SetAccessTokenMutation>;
-export type SetAccessTokenMutationOptions = ApolloReactCommon.BaseMutationOptions<SetAccessTokenMutation, SetAccessTokenMutationVariables>;
 export const GetClientIdDocument = gql`
-    query getClientId {
+    query GetClientId {
   clientId @client
 }
     `;
@@ -355,37 +331,38 @@ export function useGetClientIdLazyQuery(baseOptions?: ApolloReactHooks.LazyQuery
 export type GetClientIdQueryHookResult = ReturnType<typeof useGetClientIdQuery>;
 export type GetClientIdLazyQueryHookResult = ReturnType<typeof useGetClientIdLazyQuery>;
 export type GetClientIdQueryResult = ApolloReactCommon.QueryResult<GetClientIdQuery, GetClientIdQueryVariables>;
-export const GenerateClientIdDocument = gql`
-    mutation generateClientId {
-  generateClientId @client
+export const SetAccessTokenDocument = gql`
+    mutation SetAccessToken($accessToken: String!) {
+  setAccessToken(accessToken: $accessToken) @client
 }
     `;
-export type GenerateClientIdMutationFn = ApolloReactCommon.MutationFunction<GenerateClientIdMutation, GenerateClientIdMutationVariables>;
+export type SetAccessTokenMutationFn = ApolloReactCommon.MutationFunction<SetAccessTokenMutation, SetAccessTokenMutationVariables>;
 
 /**
- * __useGenerateClientIdMutation__
+ * __useSetAccessTokenMutation__
  *
- * To run a mutation, you first call `useGenerateClientIdMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useGenerateClientIdMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useSetAccessTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetAccessTokenMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [generateClientIdMutation, { data, loading, error }] = useGenerateClientIdMutation({
+ * const [setAccessTokenMutation, { data, loading, error }] = useSetAccessTokenMutation({
  *   variables: {
+ *      accessToken: // value for 'accessToken'
  *   },
  * });
  */
-export function useGenerateClientIdMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<GenerateClientIdMutation, GenerateClientIdMutationVariables>) {
-        return ApolloReactHooks.useMutation<GenerateClientIdMutation, GenerateClientIdMutationVariables>(GenerateClientIdDocument, baseOptions);
+export function useSetAccessTokenMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SetAccessTokenMutation, SetAccessTokenMutationVariables>) {
+        return ApolloReactHooks.useMutation<SetAccessTokenMutation, SetAccessTokenMutationVariables>(SetAccessTokenDocument, baseOptions);
       }
-export type GenerateClientIdMutationHookResult = ReturnType<typeof useGenerateClientIdMutation>;
-export type GenerateClientIdMutationResult = ApolloReactCommon.MutationResult<GenerateClientIdMutation>;
-export type GenerateClientIdMutationOptions = ApolloReactCommon.BaseMutationOptions<GenerateClientIdMutation, GenerateClientIdMutationVariables>;
+export type SetAccessTokenMutationHookResult = ReturnType<typeof useSetAccessTokenMutation>;
+export type SetAccessTokenMutationResult = ApolloReactCommon.MutationResult<SetAccessTokenMutation>;
+export type SetAccessTokenMutationOptions = ApolloReactCommon.BaseMutationOptions<SetAccessTokenMutation, SetAccessTokenMutationVariables>;
 export const MeDocument = gql`
-    query me {
+    query Me {
   me {
     ...User
   }
@@ -416,3 +393,35 @@ export function useMeLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptio
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = ApolloReactCommon.QueryResult<MeQuery, MeQueryVariables>;
+export const UsersDocument = gql`
+    subscription Users {
+  users {
+    mutation
+    entity {
+      ...User
+    }
+    updatedFields
+  }
+}
+    ${UserFragmentDoc}`;
+
+/**
+ * __useUsersSubscription__
+ *
+ * To run a query within a React component, call `useUsersSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useUsersSubscription` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUsersSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUsersSubscription(baseOptions?: ApolloReactHooks.SubscriptionHookOptions<UsersSubscription, UsersSubscriptionVariables>) {
+        return ApolloReactHooks.useSubscription<UsersSubscription, UsersSubscriptionVariables>(UsersDocument, baseOptions);
+      }
+export type UsersSubscriptionHookResult = ReturnType<typeof useUsersSubscription>;
+export type UsersSubscriptionResult = ApolloReactCommon.SubscriptionResult<UsersSubscription>;

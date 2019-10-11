@@ -1,6 +1,5 @@
 import { Field, ID, ObjectType } from 'type-graphql'
 import {
-  BaseEntity,
   BeforeInsert,
   CreateDateColumn,
   PrimaryColumn,
@@ -24,7 +23,7 @@ export abstract class IdEntity {
   updatedAt?: Date
 
   // Stores changes when updating so we can access later
-  changes: Partial<IdEntity>
+  changes?: Partial<IdEntity>
 
   @BeforeInsert()
   generateId() {
@@ -39,8 +38,10 @@ export abstract class IdEntityPartial implements Partial<IdEntity> {
   id: string
 
   @Field(type => Date, { nullable: true })
-  createdAt?: Date
+  createdAt: Date
 
   @Field(type => Date, { nullable: true })
-  updatedAt?: Date
+  updatedAt: Date
+
+  generateId() {}
 }

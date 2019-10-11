@@ -1,0 +1,7 @@
+type Query {
+  clientId: String!
+}
+
+query GetClientId {
+  clientId @client
+}

@@ -1,0 +1,9 @@
+subscription Users {
+  users {
+    mutation
+    entity {
+      ...User
+    }
+    updatedFields
+  }
+}

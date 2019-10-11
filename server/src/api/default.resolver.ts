@@ -4,7 +4,6 @@ import {
   Resolver,
   Subscription
   } from '@nestjs/graphql'
-import {} from 'type-graphql'
 
 // Graphql cannot have empty Query, Mutation, and Subscription types
 // so we need to create defaults for each.

@@ -45,7 +45,7 @@ import { GqlContext } from './types/gql-context.type'
           }
         },
         context: async ({ req, res, connection }): Promise<GqlContext> => {
-          loggerService.logRequest(req)
+          if (req) loggerService.logRequest(req)
 
           // Get socket connection metadata, if available (subscriptions only)
           let conn
