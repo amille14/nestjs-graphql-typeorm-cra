@@ -1,4 +1,4 @@
-import { DocumentNode, OperationDefinitionNode, SelectionNode } from 'graphql'
+import { DocumentNode, OperationDefinitionNode } from 'graphql'
 import { useEffect, useState } from 'react'
 
 export const useForceUpdate = () => {
@@ -37,20 +37,22 @@ export const itemsUpdateQuery = (
 export const useSubscribeToItems = (
   subscribeToMore: Function, // subscribeToMore function from useQuery hook
   document: DocumentNode, // Subscription document
-  variables?: any // Variables to pass to subscribeToMore options
+  variables?: object,
+  onError?: Function
 ) => {
   useEffect(() => {
     return subscribeToMore({
       document,
       variables,
-      updateQuery: (prev, options) => {
+      onError,
+      updateQuery: (prev, updateOptions) => {
         const operation = document.definitions.find(
           d => d.kind === 'OperationDefinition' && d.operation === 'subscription'
         ) as OperationDefinitionNode
         const selection = operation.selectionSet.selections[0] as any
         const subscriptionName = selection.name.value
-        return itemsUpdateQuery(subscriptionName, prev, options)
+        return itemsUpdateQuery(subscriptionName, prev, updateOptions)
       }
     })
-  }, [subscribeToMore, document, variables])
+  }, [subscribeToMore, document, variables, onError])
 }

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { GraphQLModule } from '@nestjs/graphql'
+import { pick } from 'lodash'
 import { AuthModule } from '../auth/auth.module'
 import { AuthService } from '../auth/auth.service'
 import { ConfigModule } from '../config/config.module'
@@ -32,22 +33,31 @@ import { GqlContext } from './types/gql-context.type'
         subscriptions: {
           path: '/api',
           onConnect: async (params, socket, context) => {
-            const { accessToken } = params
-            console.log('WEBSOCKET CONNECTED', accessToken)
+            const { accessToken, clientId } = params
+            console.log(`Websocket connected (client id: ${clientId}).`)
+
+            socket.metadata = {
+              clientId
+            }
 
             // This gets attached to connection.context object and passed to graphql context
             return { accessToken }
           },
           onDisconnect: async (socket, context) => {
-            console.log('WEBSOCKET DISCONNECTED')
+            console.log(`Websocket disconnected (client id: ${socket.metadata.clientId}).`)
           }
         },
-        context: async ({ req, res, connection }): Promise<GqlContext> => {
+        context: async ({ req, res, connection, payload = {} }): Promise<GqlContext> => {
           if (req) loggerService.logRequest(req)
 
           // Get socket connection metadata, if available (subscriptions only)
           let conn
-          if (connection) conn = connection.context
+          if (connection) {
+            // On each subscription operation we send additional metadata (like accessToken) in payload.
+            // We need to merge it with metadata sent on initializing the connection.
+            Object.assign(connection.context, pick(payload, ['accessToken', 'clientId']))
+            conn = connection.context
+          }
 
           // Get access token, if available
           const accessToken = authService.getAccessTokenFromContext({

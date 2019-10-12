@@ -1,17 +1,15 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
-import {
-  useAllUsersQuery,
-  useMeLazyQuery,
-  UsersDocument,
-  useUsersSubscription
-  } from '../../graphql/generated'
+import { useAllUsersQuery, useMeLazyQuery, UsersDocument } from '../../graphql/generated'
 import { useSubscribeToItems } from '../../utils/hooks'
+import ErrorPage from '../ErrorPage/ErrorPage'
 
 const MainPage: React.FC = () => {
-  const { data, loading, error, subscribeToMore } = useAllUsersQuery()
-  const [me, stuff] = useMeLazyQuery({ fetchPolicy: 'network-only' })
+  const { data, loading, error, subscribeToMore } = useAllUsersQuery({ errorPolicy: 'all' })
+  const [me] = useMeLazyQuery({ fetchPolicy: 'network-only' })
   useSubscribeToItems(subscribeToMore, UsersDocument)
+
+  if (error) return <ErrorPage error={error} />
 
   return (
     <div>
@@ -35,7 +33,6 @@ const MainPage: React.FC = () => {
       )}
       <button
         onClick={() => {
-          console.log('CLICKED')
           me()
         }}
       >

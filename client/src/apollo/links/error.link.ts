@@ -1,48 +1,46 @@
 import { onError } from 'apollo-link-error'
-import { promiseToObservable } from '../../utils/helpers'
 import { logFailure, logSuccess } from '../../utils/log'
 import { logoutRequest, refreshAccessTokenRequest, setAccessToken } from './../../utils/auth'
 
-export const createErrorLink = (getClient: Function) => {
+export const createErrorLink = () => {
   return onError(({ graphQLErrors, networkError, operation, forward }) => {
-    const { cache } = operation.getContext()
+    const { cache, getClient } = operation.getContext()
 
-    console.log('gqe', graphQLErrors)
-    console.log('ne', networkError)
+    // Logout user, then redirect to login page
+    const logout = () => {
+      logFailure('Authentication failed.')
+      return logoutRequest().then(async res => {
+        await getClient().resetStore()
+        // window.location.replace('/login')
+      })
+    }
 
+    // Handle all graphql errors
     if (graphQLErrors) {
-      graphQLErrors.forEach(error => {
+      graphQLErrors.forEach(async error => {
         const {
           message: { statusCode, message }
         } = error as any
 
-        // Handle authentication errors
-        if (statusCode === 401) {
-          switch (message) {
-            case 'INVALID_ACCESS_TOKEN':
-              // Attempt to refresh access token
-              const promise = refreshAccessTokenRequest().then(async res => {
-                if (res.status === 201) {
-                  logSuccess('Authenticated!')
-                  const { accessToken } = await res.json()
-                  setAccessToken(cache, accessToken)
-                  getClient().restartConnection()
-                }
+        switch (statusCode) {
+          case 401:
+            // Attempt to refresh access token
+            if (message === 'INVALID_ACCESS_TOKEN') {
+              const res = await refreshAccessTokenRequest()
 
-                if (res.status === 401) {
-                  logFailure('Authentication failed.')
-                }
+              if (res.ok) {
+                logSuccess('Authenticated!')
+                const { accessToken } = await res.json()
+                setAccessToken(cache, accessToken)
+                return forward(operation)
+              }
+            }
 
-                return res
-              })
-              const observable = promiseToObservable(promise)
-              return observable.flatMap(() => forward(operation))
-            case 'INVALID_REFRESH_TOKEN':
-              logoutRequest().then(res => getClient().resetStore())
-              break
-            default:
-              break
-          }
+            // If refresh fails, logout user
+            logout()
+            break
+          default:
+            return forward(operation)
         }
       })
     }

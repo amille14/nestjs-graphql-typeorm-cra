@@ -45,7 +45,6 @@ export class UserResolver {
   @Subscription(returns => UserMutationPayload, {
     resolve: payload => payload
   })
-  @UseGuards(IsAuthenticated)
   users() {
     return this.pubsub.asyncIterator(['User_created', 'User_updated', 'User_deleted'])
   }

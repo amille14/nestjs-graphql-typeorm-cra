@@ -12,14 +12,12 @@ export const createLoggerLink = () => {
     const { operation: opType } = query.definitions[0] as any
 
     // Log requests
-    console.log(
+    console.info(
       `%c[REQ] %c${opType.toUpperCase()} ${operationName}`,
       'color: lightskyblue;',
       `color: ${OPERATION_COLORS[opType]};`,
       variables
     )
-
-    console.log('OP', operation)
 
     // Log responses
     return forward(operation).map(result => {
@@ -31,13 +29,14 @@ export const createLoggerLink = () => {
           result.errors[0].message
         )
       } else {
-        console.log(
+        console.info(
           `%c[RES] %c${opType.toUpperCase()} ${operationName}`,
           'color: lightgreen;',
           `color: ${OPERATION_COLORS[opType]}`,
           result.data
         )
       }
+
       return result
     })
   })

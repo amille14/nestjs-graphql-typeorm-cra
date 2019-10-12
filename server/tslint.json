@@ -16,7 +16,8 @@
     "trailing-comma": false,
     "semicolon": [true, "never"],
     "max-classes-per-file": false,
-    "curly": false
+    "curly": false,
+    "react-hooks/exhaustive-deps": "warn"
   },
   "rulesDirectory": []
 }

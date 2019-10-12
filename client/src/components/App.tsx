@@ -33,7 +33,7 @@ const App: React.FC = () => {
         setError(error)
         setLoading(false)
       })
-  }, [])
+  }, [setAccessToken])
 
   return (
     <div className="App">

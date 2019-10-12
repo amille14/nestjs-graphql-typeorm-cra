@@ -1,5 +1,4 @@
 import { ApolloCache } from 'apollo-cache'
-import ApolloClient from 'apollo-client'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import { decode } from 'jsonwebtoken'
 import {
@@ -20,10 +19,12 @@ export const createRefreshLink = (cache: ApolloCache<any>, getClient: Function) 
       const isValid = decoded && decoded.userId && decoded.exp * 1000 > Date.now()
       return isValid
     },
-    fetchAccessToken: () => refreshAccessTokenRequest(),
+    fetchAccessToken: () => {
+      return refreshAccessTokenRequest()
+    },
     handleFetch: (accessToken: string) => {
-      setAccessToken(cache, accessToken)
       logSuccess('Authenticated!')
+      setAccessToken(cache, accessToken)
     },
     handleError: (err: any) => {
       logFailure('Authentication failed.')

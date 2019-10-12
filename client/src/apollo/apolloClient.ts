@@ -29,24 +29,21 @@ export const createApolloClient = () => {
     resolvers,
     link: ApolloLink.from([
       setContextLink(getClient),
-
       createLoggerLink(),
-      createAuthLink(),
-
       createRefreshLink(cache, getClient),
-
-      createErrorLink(getClient),
+      createErrorLink(),
+      createAuthLink(),
       createHybridLink(subscriptionsClient)
     ]),
     connectToDevTools: true
   })
 
-  client.getSubscriptionsClient = () => subscriptionsClient
-  // Close and restart the ws connection with new params
+  // Close and restart the ws connection with new params.
+  // Uses non-public api, see https://github.com/apollographql/subscriptions-transport-ws/issues/171
   client.restartConnection = () => {
     const sc = subscriptionsClient as any
     sc.close(false, false)
-    sc.tryReconnect()
+    sc.connect()
   }
 
   // Setup local state
