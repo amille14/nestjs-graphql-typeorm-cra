@@ -4,11 +4,11 @@ import { AuthModule } from '../auth/auth.module'
 import { AuthService } from '../auth/auth.service'
 import { ConfigModule } from '../config/config.module'
 import { ConfigService } from '../config/config.service'
-import { DateTimeScalar } from '../entities/shared/scalars/datetime.scalar'
 import { GqlLoggerService } from '../logger/gql-logger.service'
 import { LoggerModule } from '../logger/logger.module'
 import { CORS_OPTIONS } from '../main'
 import { DefaultResolver } from './default.resolver'
+import { DateTimeScalar } from './scalars/datetime.scalar'
 import { GqlContext } from './types/gql-context.type'
 
 // Our apollo graphql api
@@ -33,12 +33,9 @@ import { GqlContext } from './types/gql-context.type'
           path: '/api',
           onConnect: async (params, socket, context) => {
             const { accessToken } = params
+            console.log('WEBSOCKET CONNECTED', accessToken)
 
-            console.log('WEBSOCKET CONNECTED')
-
-            // TODO: Handle cookies
-
-            // This gets attached to connection.context object
+            // This gets attached to connection.context object and passed to graphql context
             return { accessToken }
           },
           onDisconnect: async (socket, context) => {
@@ -79,6 +76,6 @@ import { GqlContext } from './types/gql-context.type'
       })
     })
   ],
-  providers: [DefaultResolver, DateTimeScalar]
+  providers: [DateTimeScalar, DefaultResolver]
 })
 export class ApiModule {}

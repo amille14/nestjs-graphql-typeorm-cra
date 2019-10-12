@@ -61,7 +61,9 @@ const LoginForm: React.FC<Props> = () => {
               <Field type="password" name="password" placeholder="your password" />
               <ErrorMessage className="ErrorMessage" name="password" component="div" />
             </div>
-            <button type="submit">{isSubmitting ? 'Submitting...' : 'Log in'}</button>
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Log in'}
+            </button>
           </Form>
         )}
       </Formik>

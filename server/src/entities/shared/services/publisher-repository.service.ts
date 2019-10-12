@@ -67,6 +67,10 @@ export abstract class PublisherRepository<Entity extends IdEntity> {
     return this.repo.find({ where, ...options })
   }
 
+  async findAll() {
+    return this.repo.find()
+  }
+
   getRepo() {
     return this.repo
   }

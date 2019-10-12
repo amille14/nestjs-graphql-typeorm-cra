@@ -9,9 +9,7 @@ import { AuthService } from './auth.service'
 
 @Injectable()
 export class IsAuthenticated implements CanActivate {
-  constructor(
-    @Inject('AuthService') private readonly authService: AuthService
-  ) {}
+  constructor(@Inject('AuthService') private readonly authService: AuthService) {}
 
   canActivate(context: ExecutionContext): boolean {
     const ctx = GqlExecutionContext.create(context).getContext()

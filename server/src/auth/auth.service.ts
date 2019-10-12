@@ -9,7 +9,7 @@ import { UserService } from '../entities/user/user.service'
 
 @Injectable()
 export class AuthService {
-  static ACCESS_TOKEN_EXPIRATION_TIME = '15m' // 15 minutes
+  static ACCESS_TOKEN_EXPIRATION_TIME = '5s' // 15 minutes
   static REFRESH_TOKEN_EXPIRATION_TIME = '14d' // 14 days
   static REFRESH_COOKIE_MAX_AGE = 1000 * 60 * 60 * 24 * 14 // 14 days
   static REFRESH_COOKIE_NAME = 'rid'

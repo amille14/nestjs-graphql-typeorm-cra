@@ -25,6 +25,11 @@ export class UserResolver {
     return await this.userService.findOne(user)
   }
 
+  @Query(returns => [User])
+  async allUsers(): Promise<User[]> {
+    return await this.userService.findAll()
+  }
+
   @Mutation(returns => User)
   @UseGuards(IsAuthenticated)
   async delete(@CurrentUser() user: User) {
@@ -40,6 +45,7 @@ export class UserResolver {
   @Subscription(returns => UserMutationPayload, {
     resolve: payload => payload
   })
+  @UseGuards(IsAuthenticated)
   users() {
     return this.pubsub.asyncIterator(['User_created', 'User_updated', 'User_deleted'])
   }

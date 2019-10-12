@@ -62,6 +62,7 @@ export enum MutationEventType {
 export type Query = {
    __typename?: 'Query',
   me?: Maybe<User>,
+  allUsers: Array<User>,
   default: Scalars['String'],
   accessToken: Scalars['String'],
   clientId: Scalars['String'],
@@ -157,6 +158,17 @@ export type SetAccessTokenMutationVariables = {
 export type SetAccessTokenMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'setAccessToken'>
+);
+
+export type AllUsersQueryVariables = {};
+
+
+export type AllUsersQuery = (
+  { __typename?: 'Query' }
+  & { allUsers: Array<(
+    { __typename?: 'User' }
+    & UserFragment
+  )> }
 );
 
 export type MeQueryVariables = {};
@@ -361,6 +373,38 @@ export function useSetAccessTokenMutation(baseOptions?: ApolloReactHooks.Mutatio
 export type SetAccessTokenMutationHookResult = ReturnType<typeof useSetAccessTokenMutation>;
 export type SetAccessTokenMutationResult = ApolloReactCommon.MutationResult<SetAccessTokenMutation>;
 export type SetAccessTokenMutationOptions = ApolloReactCommon.BaseMutationOptions<SetAccessTokenMutation, SetAccessTokenMutationVariables>;
+export const AllUsersDocument = gql`
+    query AllUsers {
+  allUsers {
+    ...User
+  }
+}
+    ${UserFragmentDoc}`;
+
+/**
+ * __useAllUsersQuery__
+ *
+ * To run a query within a React component, call `useAllUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAllUsersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAllUsersQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<AllUsersQuery, AllUsersQueryVariables>) {
+        return ApolloReactHooks.useQuery<AllUsersQuery, AllUsersQueryVariables>(AllUsersDocument, baseOptions);
+      }
+export function useAllUsersLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<AllUsersQuery, AllUsersQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<AllUsersQuery, AllUsersQueryVariables>(AllUsersDocument, baseOptions);
+        }
+export type AllUsersQueryHookResult = ReturnType<typeof useAllUsersQuery>;
+export type AllUsersLazyQueryHookResult = ReturnType<typeof useAllUsersLazyQuery>;
+export type AllUsersQueryResult = ApolloReactCommon.QueryResult<AllUsersQuery, AllUsersQueryVariables>;
 export const MeDocument = gql`
     query Me {
   me {

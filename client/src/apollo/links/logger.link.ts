@@ -19,6 +19,8 @@ export const createLoggerLink = () => {
       variables
     )
 
+    console.log('OP', operation)
+
     // Log responses
     return forward(operation).map(result => {
       if (result.errors) {

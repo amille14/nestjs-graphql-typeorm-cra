@@ -30,6 +30,7 @@ enum MutationEventType {
 
 type Query {
   me: User
+  allUsers: [User!]!
   default: String!
 }
 

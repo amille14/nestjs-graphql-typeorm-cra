@@ -10,7 +10,7 @@ import {
   } from '../../utils/auth'
 import { logFailure, logSuccess } from '../../utils/log'
 
-export const createRefreshLink = (cache: ApolloCache<any>, client: ApolloClient<any>) => {
+export const createRefreshLink = (cache: ApolloCache<any>, getClient: Function) => {
   return new TokenRefreshLink({
     accessTokenField: 'accessToken',
     isTokenValidOrUndefined: () => {
@@ -28,7 +28,7 @@ export const createRefreshLink = (cache: ApolloCache<any>, client: ApolloClient<
     handleError: (err: any) => {
       logFailure('Authentication failed.')
       if (err.statusCode === 401) {
-        return logoutRequest().then(res => client.resetStore())
+        return logoutRequest().then(res => getClient().resetStore())
       }
     }
   })
